@@ -14,6 +14,11 @@ return [
     |
     */
 
+    'vereinsflieger' => [
+        'key' => env('VF_APPKEY'),
+        'cid' => env('VF_CID'),
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

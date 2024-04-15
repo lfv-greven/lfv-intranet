@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
@@ -13,10 +14,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('firstname');
+            $table->string('lastname');
             $table->string('email')->unique();
+            $table->integer('memberid');
+            $table->string('status');
+            $table->json('roles')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('vf_accesstoken');
             $table->rememberToken();
             $table->timestamps();
         });
