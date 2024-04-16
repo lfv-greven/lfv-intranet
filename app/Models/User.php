@@ -54,7 +54,7 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'vf_accesstoken' => 'encrypted',
-            'roles' => 'array',
+            'roles' => 'collection',
         ];
     }
 
@@ -67,6 +67,6 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        return $this->roles->contains('Intranet Admin');
     }
 }
