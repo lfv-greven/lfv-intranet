@@ -22,7 +22,7 @@ return new class extends Migration
             $table->json('roles')->default(new Expression('(JSON_ARRAY())'));
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('vf_accesstoken');
+            $table->text('vf_accesstoken');
             $table->rememberToken();
             $table->timestamps();
         });
