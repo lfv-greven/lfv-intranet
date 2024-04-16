@@ -26,7 +26,7 @@ class VereinsfliegerUserProvider extends EloquentUserProvider
         // Login was successful, sync user data locally
         $user = $vf->GetUser();
 
-        $user = User::firstOrCreate(
+        $user = User::updateOrCreate(
             ['id' => $user['uid']],
             [
                 ...Arr::only($user, ['id', 'firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
