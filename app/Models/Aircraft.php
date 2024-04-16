@@ -14,4 +14,13 @@ class Aircraft extends Model
     protected $fillable = [
         'registration',
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('sort', function ($q) {
+            $q->orderBy('registration');
+        });
+    }
 }

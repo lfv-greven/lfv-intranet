@@ -47,12 +47,15 @@ class GasStationResource extends Resource
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('fuel_type')
+                    ->label('Kraftstoff')
                     ->badge(),
                 TextColumn::make('capacity')
                     ->alignRight()
+                    ->label('Tank-Kapazität')
                     ->numeric()
                     ->suffix(' l'),
                 TextColumn::make('refuelings_sum_amount')
+                    ->label('Aktueller Füllstand')
                     ->alignRight()
                     ->sum('refuelings', 'amount')
                     ->suffix(' l'),
