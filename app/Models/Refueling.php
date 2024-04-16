@@ -41,7 +41,7 @@ class Refueling extends Model
     {
         return [
             'type' => RefuelingType::class,
-            'date' => 'date',
+            'date' => 'immutable_datetime',
         ];
     }
 

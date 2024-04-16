@@ -7,7 +7,7 @@ use App\Filament\Resources\RefuelingResource\Pages;
 use App\Models\Aircraft;
 use App\Models\GasStation;
 use App\Models\Refueling;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -47,9 +47,10 @@ class RefuelingResource extends Resource
                     })
                     ->options(GasStation::pluck('name', 'id')),
 
-                DatePicker::make('date')
+                DateTimePicker::make('date')
+                    ->seconds(false)
                     ->required()
-                    ->default(today()),
+                    ->default(now()),
 
                 Select::make('aircraft_id')
                     ->label('Flugzeug')

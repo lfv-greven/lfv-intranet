@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignIdFor(Aircraft::class)->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
             $table->foreignIdFor(User::class)->nullable()->constrained()->nullOnDelete()->cascadeOnUpdate();
 
-            $table->date('date')->useCurrent();
+            $table->dateTime('date')->useCurrent();
             $table->string('type');
             $table->string('buyer_name');
             $table->string('buyer_registration')->nullable();

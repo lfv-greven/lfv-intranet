@@ -2,15 +2,18 @@
 
 namespace App\Livewire;
 
+use App\Enums\RefuelingType;
 use App\Models\Aircraft;
 use App\Models\GasStation;
-use Filament\Forms\Components\DatePicker;
+use App\Models\Refueling;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Livewire\Component;
 
 class RefuelingPage extends Component implements HasForms
@@ -36,7 +39,7 @@ class RefuelingPage extends Component implements HasForms
     public function mount()
     {
         $this->form->fill([
-            'date' => today(),
+            'date' => now(),
             'buyer_name' => auth()->user()?->name,
         ]);
     }
@@ -46,6 +49,31 @@ class RefuelingPage extends Component implements HasForms
         if (! $this->form->validate()) {
             return;
         }
+
+        $data = $this->form->getState();
+
+        Refueling::create([
+            'type' => RefuelingType::refueling,
+            'gas_station_id' => $data['gas_station_id'],
+            'date' => $data['date'],
+            'aircraft_id' => $data['aircraft_id'],
+            'buyer_registration' => $data['buyer_registration'],
+            'buyer_name' => $data['buyer_name'],
+            'counter_reading' => $data['counter_reading'],
+            'amount' => $data['amount'],
+            'comment' => $data['comment'],
+        ]);
+
+        Notification::make()
+            ->success()
+            ->title('Betankung wurde eingetragen')
+            ->send();
+
+        $this->reset();
+        $this->form->fill([
+            'date' => now(),
+            'buyer_name' => auth()->user()?->name,
+        ]);
     }
 
     public function form(Form $form): Form
@@ -68,12 +96,13 @@ class RefuelingPage extends Component implements HasForms
                     })
                     ->options(GasStation::pluck('name', 'id')),
 
-                DatePicker::make('date')
+                DateTimePicker::make('date')
+                    ->seconds(false)
                     ->label('Datum')
                     ->required()
-                    ->maxDate(today())
+                    ->maxDate(now())
                     ->minDate(today()->startOfMonth())
-                    ->default(today()),
+                    ->default(now()),
 
                 Select::make('aircraft_id')
                     ->label('Flugzeug')
