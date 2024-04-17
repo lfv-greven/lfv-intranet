@@ -59,11 +59,7 @@ class OilLogPage extends Component implements HasForms
             ->body('Danke für deine Mithilfe!')
             ->send();
 
-        $this->reset();
-        $this->form->fill([
-            'date' => now(),
-            'buyer_name' => auth()->user()?->name,
-        ]);
+        return $this->redirectRoute('home', navigate: true);
     }
 
     public function form(Form $form): Form

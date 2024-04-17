@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Auth\VereinsfliegerUserProvider;
 use App\External\Vereinsflieger;
 use App\Models\User;
+use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         Auth::provider('vereinsflieger', function ($app, $config) {
             return new VereinsfliegerUserProvider(app('hash'), User::class);
         });
+
+        FilamentColor::register([
+            'primary' => '#F65812',
+        ]);
     }
 }

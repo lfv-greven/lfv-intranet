@@ -69,11 +69,7 @@ class RefuelingPage extends Component implements HasForms
             ->title('Betankung wurde eingetragen')
             ->send();
 
-        $this->reset();
-        $this->form->fill([
-            'date' => now(),
-            'buyer_name' => auth()->user()?->name,
-        ]);
+        return $this->redirectRoute('home', navigate: true);
     }
 
     public function form(Form $form): Form
