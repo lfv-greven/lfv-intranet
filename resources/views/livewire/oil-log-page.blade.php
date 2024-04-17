@@ -14,4 +14,10 @@
             </x-filament::button>
         </div>
     </form>
+
+    <div class="mt-12 text-center">
+        <x-filament::link :href="route('home')">
+            zurück
+        </x-filament::link>
+    </div>
 </div>
