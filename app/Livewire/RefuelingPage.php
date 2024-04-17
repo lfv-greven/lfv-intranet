@@ -93,6 +93,8 @@ class RefuelingPage extends Component implements HasForms
                     ->options(GasStation::pluck('name', 'id')),
 
                 DateTimePicker::make('date')
+                    ->native(false)
+                    ->displayFormat('d.m.Y H:i')
                     ->seconds(false)
                     ->label('Datum')
                     ->required()
