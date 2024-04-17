@@ -13,3 +13,7 @@ h1 {
 div.container {
     @apply mx-auto bg-white m-4 p-4 rounded;
 }
+
+a.link {
+    @apply font-bold hover:underline text-sm text-primary;
+}

@@ -16,8 +16,8 @@
     </form>
 
     <div class="mt-12 text-center">
-        <x-filament::link :href="route('home')">
+        <a href="{{ route('home') }}" class="link" wire:navigate>
             zurück
-        </x-filament::link>
+        </a>
     </div>
 </div>
