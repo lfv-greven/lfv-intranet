@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\FuelType;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,13 @@ class GasStation extends Model
         'fuel_type',
         'capacity',
     ];
+
+    protected function casts()
+    {
+        return [
+            'fuel_type' => FuelType::class,
+        ];
+    }
 
     public function refuelings()
     {

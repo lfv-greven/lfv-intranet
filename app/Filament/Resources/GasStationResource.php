@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\FuelType;
 use App\Filament\Resources\GasStationResource\Pages;
 use App\Models\GasStation;
 use Filament\Forms\Components\Select;
@@ -28,14 +29,14 @@ class GasStationResource extends Resource
             ->columns(1)
             ->schema([
                 TextInput::make('name')
+                    ->label('Name')
                     ->required(),
                 Select::make('fuel_type')
-                    ->options([
-                        'avgas' => 'AVGAS',
-                        'super' => 'Super',
-                    ])
+                    ->options(FuelType::class)
+                    ->label('Kraftstoff')
                     ->required(),
                 TextInput::make('capacity')
+                    ->label('Maximale Kapazität')
                     ->required()
                     ->suffix('l'),
             ]);

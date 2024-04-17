@@ -120,11 +120,7 @@ class RefuelingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(
-                static::getEloquentQuery()
-                    ->orderByDesc('date')
-                    ->orderByDesc('created_at')
-            )
+            ->defaultSort('date', 'desc')
             ->columns([
                 TextColumn::make('date')
                     ->label('Datum')

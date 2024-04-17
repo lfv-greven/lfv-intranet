@@ -2,7 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Enums\FuelType;
+use App\Enums\RefuelingType;
+use App\Models\Aircraft;
+use App\Models\GasStation;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +16,35 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create AVGAS Station with demo filling
+        $avgas = GasStation::create([
+            'name' => 'AVGAS',
+            'fuel_type' => FuelType::avgas,
+            'capacity' => 10000,
         ]);
+        $avgas->refuelings()->create([
+            'date' => today()->subDays(14),
+            'type' => RefuelingType::filling,
+            'buyer_name' => 'John Doe',
+            'counter_reading' => 180440,
+            'amount' => 10000,
+        ]);
+
+        // Create Super Station with demo filling
+        $super = GasStation::create([
+            'name' => 'Super',
+            'fuel_type' => FuelType::super,
+            'capacity' => 800,
+        ]);
+        $super->refuelings()->create([
+            'date' => today()->subDays(14),
+            'type' => RefuelingType::filling,
+            'buyer_name' => 'John Doe',
+            'counter_reading' => 25440,
+            'amount' => 800,
+        ]);
+
+        // Create some Aircraft
+        Aircraft::factory()->times(10)->create();
     }
 }

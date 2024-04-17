@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Uppercase;
 use App\Enums\RefuelingType;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,6 +43,7 @@ class Refueling extends Model
         return [
             'type' => RefuelingType::class,
             'date' => 'immutable_datetime',
+            'buyer_registration' => Uppercase::class,
         ];
     }
 
