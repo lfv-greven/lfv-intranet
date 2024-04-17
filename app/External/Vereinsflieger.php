@@ -27,8 +27,6 @@ class Vereinsflieger
         // Accesstoken holen
         $this->SendRequest('GET', 'auth/accesstoken', null);
         if ($this->HttpStatusCode != 200 || ! $this->aResponse) {
-            dd(123);
-
             return false;
         }
         $this->AccessToken = $this->aResponse['accesstoken'];
