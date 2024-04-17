@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Aircraft;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,10 +13,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('aircraft', function (Blueprint $table) {
+        Schema::create('oil_logs', function (Blueprint $table) {
             $table->ulid('id')->primary();
+            $table->foreignIdFor(User::class)->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+            $table->foreignIdFor(Aircraft::class)->nullable()->constrained()->cascadeOnUpdate()->nullOnDelete();
+
+            $table->string('pilot');
             $table->string('registration');
-            $table->string('oil_level_type');
+            $table->double('oil_level');
+
             $table->timestamps();
         });
     }
@@ -24,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('aircraft');
+        Schema::dropIfExists('oil_logs');
     }
 };

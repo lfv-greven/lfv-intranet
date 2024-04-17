@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\OilLevelType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,6 +19,7 @@ class AircraftFactory extends Factory
     {
         return [
             'registration' => $this->faker->lexify('D-E???'),
+            'oil_level_type' => $this->faker->randomElement(OilLevelType::cases()),
         ];
     }
 }

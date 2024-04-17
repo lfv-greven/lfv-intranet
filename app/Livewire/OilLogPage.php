@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Enums\OilLevelType;
+use App\Models\Aircraft;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Form;
+use Filament\Notifications\Notification;
+use Livewire\Attributes\Locked;
+use Livewire\Component;
+
+class OilLogPage extends Component implements HasForms
+{
+    use InteractsWithForms;
+
+    public $pilot;
+
+    public $aircraft_id;
+
+    public $oil_level;
+
+    public $oil_refilled;
+
+    #[Locked]
+    public ?OilLevelType $oilLevelType = null;
+
+    public function mount()
+    {
+        $this->form->fill([
+            'pilot' => auth()->user()?->name,
+            'oil_refilled' => 0,
+        ]);
+    }
+
+    public function save()
+    {
+        if (! $this->form->validate()) {
+            return;
+        }
+
+        $data = $this->form->getState();
+
+        $aircraft = Aircraft::findOrFail($data['aircraft_id']);
+        $aircraft->oilLogs()->create([
+            'user_id' => auth()->id(),
+            'pilot' => $data['pilot'],
+            'registration' => $aircraft->registration,
+            'oil_level' => $data['oil_level'],
+        ]);
+
+        Notification::make()
+            ->success()
+            ->title('Ölstand wurde erfasst.')
+            ->body('Danke für deine Mithilfe!')
+            ->send();
+
+        $this->reset();
+        $this->form->fill([
+            'date' => now(),
+            'buyer_name' => auth()->user()?->name,
+        ]);
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+
+                TextInput::make('pilot')
+                    ->required()
+                    ->placeholder('Max Mustermann')
+                    ->label('Pilot'),
+
+                Select::make('aircraft_id')
+                    ->required()
+                    ->label('Flugzeug')
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
+                        if (! $state) {
+                            return;
+                        }
+
+                        $aircraft = Aircraft::findOrFail($state);
+
+                        $set('oil_level', $aircraft->getOilLevel());
+                        $this->oilLevelType = $aircraft->oil_level_type;
+                    })
+                    ->options(Aircraft::pluck('registration', 'id')),
+
+                TextInput::make('oil_level')
+                    ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)
+                    ->required()
+                    ->numeric()
+                    ->disabled(fn ($get) => blank($get('aircraft_id')))
+                    ->suffix(' qts')
+                    ->label('Ölstand')
+                    ->step(0.1),
+
+                Radio::make('oil_level')
+                    ->visible(fn () => $this->oilLevelType == OilLevelType::relative)
+                    ->required()
+                    ->disabled(fn ($get) => blank($get('aircraft_id')))
+                    ->label('Ölstand')
+                    ->options([
+                        0 => 'min',
+                        25 => '1 / 4',
+                        50 => '1 / 2',
+                        75 => '3 / 4',
+                        100 => 'max',
+                    ]),
+
+                TextInput::make('oil_refilled')
+                    ->required()
+                    ->visible(fn ($get) => filled($get('aircraft_id')))
+                    ->suffix(fn () => match ($this->oilLevelType) {
+                        OilLevelType::absolute => ' qts',
+                        OilLevelType::relative => ' ml',
+                        default => null,
+                    })
+                    ->numeric()
+                    ->label('Menge, die du nachgefüllt hast')
+                    ->step(0.5),
+
+            ]);
+    }
+
+    public function render()
+    {
+        return view('livewire.oil-log-page');
+    }
+}

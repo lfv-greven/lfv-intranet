@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\Uppercase;
+use App\Enums\OilLevelType;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ class Aircraft extends Model
 
     protected $fillable = [
         'registration',
+        'oil_level_type',
     ];
 
     public static function boot()
@@ -29,6 +31,17 @@ class Aircraft extends Model
     {
         return [
             'registration' => Uppercase::class,
+            'oil_level_type' => OilLevelType::class,
         ];
+    }
+
+    public function oilLogs()
+    {
+        return $this->hasMany(OilLog::class);
+    }
+
+    public function getOilLevel(): float
+    {
+        return $this->oilLogs()->orderByDesc('created_at')->first()?->oil_level ?? 0;
     }
 }

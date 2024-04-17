@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OilLevelType;
 use App\Filament\Resources\AircraftResource\Pages;
 use App\Models\Aircraft;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -23,6 +25,10 @@ class AircraftResource extends Resource
             ->schema([
                 TextInput::make('registration')
                     ->required(),
+                Select::make('oil_level_type')
+                    ->label('Wie wird der Ölstand gemessen?')
+                    ->required()
+                    ->options(OilLevelType::class),
             ]);
     }
 
@@ -31,6 +37,14 @@ class AircraftResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('registration'),
+                TextColumn::make('oil_level')
+                    ->numeric()
+                    ->getStateUsing(fn ($record) => $record->getOilLevel())
+                    ->suffix(fn ($record) => match ($record->oil_level_type) {
+                        OilLevelType::absolute => ' qts',
+                        OilLevelType::relative => ' %',
+                    })
+                    ->label('Ölstand'),
             ])
             ->filters([
                 //
