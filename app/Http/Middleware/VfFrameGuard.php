@@ -17,7 +17,6 @@ class VfFrameGuard
     {
         // set iframe headers
         $response = $next($request);
-        $response->headers->set('X-Frame-Options', 'ALLOW-FROM https://vereinsflieger.de');
         $response->headers->set('Content-Security-Policy', 'frame-ancestors https://vereinsflieger.de');
 
         return $response;

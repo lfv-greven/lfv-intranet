@@ -1,23 +1,23 @@
 <div>
     <h1>Intranet</h1>
 
-    @auth
-        <p class="text-center">{{ auth()->user()->firstname, }}, was möchtest du tun?</p>
-    @else
-        <p class="text-center">Was möchtest du tun?</p>
-    @endauth
+    <div class="mb-12">
+        @auth
+            <p class="text-center">{{ auth()->user()->firstname, }}, was möchtest du tun?</p>
+        @else
+            <p class="text-center">Was möchtest du tun?</p>
+        @endauth
+    </div>
 
-    <a href="{{ route('refueling') }}" wire:navigate class="flex bg-neutral-200 rounded items-center p-4 space-x-4 mt-12">
-        <img src="{{ Vite::asset('resources/images/icons/gas-pump.png') }}" alt="Öl" class="h-16">
-        <div class="flex-1 font-bold">Tanken erfassen</div>
-        <x-filament::icon icon="heroicon-s-chevron-right" class="w-4 h-4" />
-    </a>
+    <div class="space-y-6">
+        <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')" :external="$isIframe">
+            Tanken erfassen
+        </x-home.menu-link>
 
-    <a href="{{ route('oil') }}" wire:navigate class="flex bg-neutral-200 rounded items-center p-4 space-x-4 mt-4">
-        <img src="{{ Vite::asset('resources/images/icons/barrel.png') }}" alt="Öl" class="h-16">
-        <div class="flex-1 font-bold">Ölstand erfassen</div>
-        <x-filament::icon icon="heroicon-s-chevron-right" class="w-4 h-4" />
-    </a>
+        <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.png')" :external="$isIframe">
+            Ölstand erfassen
+        </x-home.menu-link>
+    </div>
 
     @auth
         <div class="mt-12 text-center">

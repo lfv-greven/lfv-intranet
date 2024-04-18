@@ -12,7 +12,7 @@ class AuthController extends Controller
     public function vfLogin(Request $request)
     {
         if (auth()->user()) {
-            return redirect()->route('home');
+            return redirect()->route('home', ['iframe' => true]);
         }
 
         $token = $request->get('accesstoken');
@@ -20,12 +20,12 @@ class AuthController extends Controller
         $vfUser = $vf->IframeLogin($token);
 
         if (! $vfUser) {
-            return redirect()->route('login');
+            return redirect()->route('home', ['iframe' => true]);
         }
 
         $user = VereinsfliegerUserProvider::transformVfUser($vfUser);
         Auth::login($user, remember: true);
 
-        return redirect()->route('home');
+        return redirect()->route('home', ['iframe' => true]);
     }
 }
