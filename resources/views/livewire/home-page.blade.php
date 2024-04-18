@@ -1,8 +1,4 @@
 <div>
-    <div class="flex justify-center">
-        <image class="w-2/3" src="{{ Vite::asset('resources/images/logo/logo.svg') }}" alt="Logo" />
-    </div>
-
     <h1>Intranet</h1>
 
     @auth
@@ -28,6 +24,12 @@
             <x-filament::link wire:click="signOut()" wire:confirm="Möchtest du dich wirklich abmelden?" tag="button">
                 abmelden
             </x-filament::link>
+        </div>
+    @else
+        <div class="mt-12 text-center">
+            <a href="{{ route('login') }}" wire:navigate class="link">
+                anmelden
+            </a>
         </div>
     @endauth
 </div>

@@ -16,6 +16,6 @@ class HomePage extends Component
         auth()->logout();
         session()->regenerate();
 
-        return $this->redirectRoute('home');
+        return $this->redirectRoute('login');
     }
 }
