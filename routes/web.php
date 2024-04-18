@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Livewire\HomePage;
 use App\Livewire\LoginPage;
 use App\Livewire\OilLogPage;
@@ -13,3 +14,4 @@ Route::get('/tanken', RefuelingPage::class)->name('refueling');
 Route::get('/oil', OilLogPage::class)->name('oil');
 
 Route::get('/login', LoginPage::class)->name('login')->middleware('guest');
+Route::post('/login/iframe', [AuthController::class, 'vfLogin']);

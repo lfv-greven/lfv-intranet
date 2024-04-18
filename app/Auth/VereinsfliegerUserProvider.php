@@ -30,16 +30,20 @@ class VereinsfliegerUserProvider extends EloquentUserProvider
         return static::transformVfUser($user, $vf->GetAccessToken(), $credentials['password']);
     }
 
-    public static function transformVfUser(array $vfUser, string $accessToken, $password = null): User
+    public static function transformVfUser(array $vfUser, ?string $accessToken = null, $password = null): User
     {
         $user = User::updateOrCreate(
             ['id' => $vfUser['uid']],
             [
-                ...Arr::only($vfUser, ['id', 'firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
+                ...Arr::only($vfUser, ['firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
                 'password' => $password ?? Str::random(),
                 'vf_accesstoken' => $accessToken,
+                'email_verified_at' => now(),
             ],
         );
+
+        $user->email_verified_at = now();
+        $user->save();
 
         return $user;
     }

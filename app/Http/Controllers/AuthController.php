@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Auth\VereinsfliegerUserProvider;
 use App\External\Vereinsflieger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -13,13 +14,14 @@ class AuthController extends Controller
         $token = $request->get('accesstoken');
         $vf = app()->make(Vereinsflieger::class);
         $vfUser = $vf->IframeLogin($token);
-        abort_if($vfUser == null, 403);
 
-        $user = VereinsfliegerUserProvider::transformVfUser(
-            $vfUser,
-            $token,
-        );
+        if (! $vfUser) {
+            return redirect()->route('login');
+        }
 
-        return response()->json($user);
+        $user = VereinsfliegerUserProvider::transformVfUser($vfUser);
+        Auth::login($user, remember: true);
+
+        return redirect()->route('home');
     }
 }
