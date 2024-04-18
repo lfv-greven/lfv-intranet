@@ -6,6 +6,7 @@ use App\External\Vereinsflieger;
 use App\Models\User;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class VereinsfliegerUserProvider extends EloquentUserProvider
 {
@@ -26,12 +27,17 @@ class VereinsfliegerUserProvider extends EloquentUserProvider
         // Login was successful, sync user data locally
         $user = $vf->GetUser();
 
+        return static::transformVfUser($user, $vf->GetAccessToken(), $credentials['password']);
+    }
+
+    public static function transformVfUser(array $vfUser, string $accessToken, $password = null): User
+    {
         $user = User::updateOrCreate(
-            ['id' => $user['uid']],
+            ['id' => $vfUser['uid']],
             [
-                ...Arr::only($user, ['id', 'firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
-                'password' => $credentials['password'],
-                'vf_accesstoken' => $vf->GetAccessToken(),
+                ...Arr::only($vfUser, ['id', 'firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
+                'password' => $password ?? Str::random(),
+                'vf_accesstoken' => $accessToken,
             ],
         );
 

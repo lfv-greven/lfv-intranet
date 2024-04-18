@@ -72,6 +72,20 @@ class Vereinsflieger
     }
 
     //=============================================================================================
+    // Login from iframe
+    //=============================================================================================
+    public function IframeLogin(string $accessToken)
+    {
+        $Data = ['accesstoken' => $accessToken];
+        $this->SendRequest('POST', 'auth/getuser', $Data);
+        if ($this->HttpStatusCode == 200) {
+            return $this->aResponse;
+        }
+
+        return null;
+    }
+
+    //=============================================================================================
     // InsertFlight
     //=============================================================================================
     public function InsertFlight($aFlighData)
