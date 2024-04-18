@@ -11,6 +11,10 @@ class AuthController extends Controller
 {
     public function vfLogin(Request $request)
     {
+        if (auth()->user()) {
+            return redirect()->route('home');
+        }
+
         $token = $request->get('accesstoken');
         $vf = app()->make(Vereinsflieger::class);
         $vfUser = $vf->IframeLogin($token);
