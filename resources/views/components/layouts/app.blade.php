@@ -29,6 +29,14 @@
         {{ $slot }}
     </div>
 
+    @if(auth()->user()?->isAdmin())
+        <div class="text-center">
+            <a href="{{ url('/admin') }}" target="_blank" class="text-neutral-700 text-xs hover:underline">
+                admin
+            </a>
+        </div>
+    @endif
+
     @livewire('notifications')
     @filamentScripts
 </body>
