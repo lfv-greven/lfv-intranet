@@ -12,8 +12,10 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -143,8 +145,44 @@ class RefuelingResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Action::make('send_vf')
+                    ->icon('heroicon-s-banknotes')
+                    ->iconButton()
+                    ->tooltip('Verkauf an Vereinsflieger übertragen')
+                    ->visible(fn ($record) => $record->type == RefuelingType::refueling)
+                    ->disabled(function (Refueling $record) {
+                        if ($record->isExported()) {
+                            return true;
+                        } elseif (! $record->gasStation->vf_articleid) {
+                            return true;
+                        }
+
+                        return false;
+                    })
+                    ->action(function (Refueling $record) {
+                        if ($record->vfExport()) {
+                            Notification::make()
+                                ->success()
+                                ->title('Verkauf wurde erfolgreich übertragen.')
+                                ->send();
+
+                            if (! $record->user_id) {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Wichtig!')
+                                    ->body('Der Nutzer war nicht eingeloggt, daher muss im Vereinsflieger noch ein Käufer eingetragen werden.')
+                                    ->send();
+                            }
+                        } else {
+                            Notification::make()
+                                ->danger()
+                                ->title('Fehler')
+                                ->body('Verkauf konnte wegen eines Fehlers nicht an den Vereinsflieger gesendet werden')
+                                ->send();
+                        }
+                    }),
+                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\DeleteAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

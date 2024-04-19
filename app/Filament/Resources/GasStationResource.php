@@ -39,6 +39,8 @@ class GasStationResource extends Resource
                     ->label('Maximale Kapazität')
                     ->required()
                     ->suffix('l'),
+                TextInput::make('vf_articleid')
+                    ->label('VF Artikel-ID'),
             ]);
     }
 

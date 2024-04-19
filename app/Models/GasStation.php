@@ -16,6 +16,7 @@ class GasStation extends Model
         'name',
         'fuel_type',
         'capacity',
+        'vf_articleid',
     ];
 
     protected function casts()

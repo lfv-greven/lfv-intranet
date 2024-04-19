@@ -7,6 +7,7 @@ use App\Enums\RefuelingType;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Refueling extends Model
 {
@@ -14,6 +15,7 @@ class Refueling extends Model
     use HasUlids;
 
     protected $fillable = [
+        'user_id',
         'gas_station_id',
         'aircraft_id',
         'date',
@@ -43,6 +45,7 @@ class Refueling extends Model
         return [
             'type' => RefuelingType::class,
             'date' => 'immutable_datetime',
+            'vf_exported_at' => 'immutable_datetime',
             'buyer_registration' => Uppercase::class,
         ];
     }
@@ -60,5 +63,43 @@ class Refueling extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isExported()
+    {
+        return filled($this->vf_exported_at);
+    }
+
+    public function vfExport(): bool
+    {
+        $vf = auth()->user()->vf();
+
+        $success = $vf->InsertSale([
+            'bookingdate' => $this->date->format('Y-m-d'),
+            'articleid' => $this->gasStation->vf_articleid,
+            'amount' => abs($this->amount),
+            'callsign' => $this->buyer_registration,
+            'memberid' => $this->user?->memberid,
+            'counter' => $this->counter_reading,
+            'comment' => "Intranet-Buchung {$this->id}",
+        ]);
+
+        if ($success) {
+            $this->vf_exported_at = now();
+            $this->save();
+
+            Log::debug('Inserted VF sale', [
+                'refueling' => $this->id,
+                'response' => $vf->GetResponse(),
+            ]);
+
+            return true;
+        }
+
+        Log::error('Failed to insert refueling sale', [
+            'vf_response' => $vf->GetResponse(),
+        ]);
+
+        return false;
     }
 }

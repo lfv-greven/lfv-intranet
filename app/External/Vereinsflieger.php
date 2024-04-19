@@ -14,6 +14,11 @@ class Vereinsflieger
 
     private $aResponse = [];
 
+    public function __construct(?string $accessToken = null)
+    {
+        $this->AccessToken = $accessToken;
+    }
+
     public function GetAccessToken()
     {
         return $this->AccessToken;

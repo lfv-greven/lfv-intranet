@@ -53,6 +53,7 @@ class RefuelingPage extends Component implements HasForms
         $data = $this->form->getState();
 
         Refueling::create([
+            'user_id' => auth()->id(),
             'type' => RefuelingType::refueling,
             'gas_station_id' => $data['gas_station_id'],
             'date' => $data['date'],
@@ -106,6 +107,10 @@ class RefuelingPage extends Component implements HasForms
                     ->label('Flugzeug')
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
+                        if (! $state) {
+                            return;
+                        }
+
                         $aircraft = Aircraft::find($state);
 
                         $set('buyer_registration', $aircraft->registration);

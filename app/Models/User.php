@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\External\Vereinsflieger;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -73,5 +74,10 @@ class User extends Authenticatable implements FilamentUser
     public function isAdmin(): bool
     {
         return $this->roles->contains('Intranet Admin') && filled($this->vf_accesstoken);
+    }
+
+    public function vf(): Vereinsflieger
+    {
+        return new Vereinsflieger($this->vf_accesstoken);
     }
 }
