@@ -7,6 +7,7 @@ use App\Filament\Resources\AircraftResource\Pages;
 use App\Models\Aircraft;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -22,6 +23,7 @@ class AircraftResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
                 TextInput::make('registration')
                     ->required(),
@@ -29,6 +31,8 @@ class AircraftResource extends Resource
                     ->label('Wie wird der Ölstand gemessen?')
                     ->required()
                     ->options(OilLevelType::class),
+                    Toggle::make('owned')
+                    ->label('Gehört dem Verein'),
             ]);
     }
 

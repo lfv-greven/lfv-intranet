@@ -20,6 +20,7 @@ class AircraftFactory extends Factory
         return [
             'registration' => $this->faker->lexify('D-E???'),
             'oil_level_type' => $this->faker->randomElement(OilLevelType::cases()),
+            'owned' => $this->faker->boolean(80),
         ];
     }
 }

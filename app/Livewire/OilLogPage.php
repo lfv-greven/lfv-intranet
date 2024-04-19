@@ -86,7 +86,7 @@ class OilLogPage extends Component implements HasForms
                         $set('oil_level', $aircraft->getOilLevel());
                         $this->oilLevelType = $aircraft->oil_level_type;
                     })
-                    ->options(Aircraft::pluck('registration', 'id')),
+                    ->options(Aircraft::owned()->pluck('registration', 'id')),
 
                 TextInput::make('oil_level')
                     ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)

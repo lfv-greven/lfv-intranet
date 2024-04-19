@@ -103,6 +103,13 @@ class RefuelingPage extends Component implements HasForms
                     ->minDate(today()->startOfMonth())
                     ->default(now()),
 
+                TextInput::make('buyer_name')
+                    ->placeholder('Max Mustermann')
+                    ->label('Name')
+                    ->label('Pilot')
+                    ->columnSpanFull()
+                    ->required(),
+
                 Select::make('aircraft_id')
                     ->label('Flugzeug')
                     ->live()
@@ -115,16 +122,13 @@ class RefuelingPage extends Component implements HasForms
 
                         $set('buyer_registration', $aircraft->registration);
                     })
-                    ->options(Aircraft::pluck('registration', 'id')),
+                    ->options([
+                        'Verein' => Aircraft::owned()->pluck('registration', 'id')->toArray(),
+                        'Privat' => Aircraft::foreign()->pluck('registration', 'id')->toArray(),
+                    ]),
 
                 TextInput::make('buyer_registration')
                     ->label('Kennzeichen')
-                    ->required(),
-
-                TextInput::make('buyer_name')
-                    ->label('Name')
-                    ->label('Pilot')
-                    ->columnSpanFull()
                     ->required(),
 
                 TextInput::make('counter_reading')

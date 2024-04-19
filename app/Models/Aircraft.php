@@ -16,6 +16,7 @@ class Aircraft extends Model
     protected $fillable = [
         'registration',
         'oil_level_type',
+        'owned',
     ];
 
     public static function boot()
@@ -32,6 +33,7 @@ class Aircraft extends Model
         return [
             'registration' => Uppercase::class,
             'oil_level_type' => OilLevelType::class,
+            'owned' => 'boolean',
         ];
     }
 
@@ -43,5 +45,15 @@ class Aircraft extends Model
     public function getOilLevel(): float
     {
         return $this->oilLogs()->orderByDesc('created_at')->first()?->oil_level ?? 0;
+    }
+
+    public function scopeOwned($q)
+    {
+        $q->where('owned', true);
+    }
+
+    public function scopeForeign($q)
+    {
+        $q->where('owned', false);
     }
 }
