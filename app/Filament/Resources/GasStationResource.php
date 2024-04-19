@@ -58,6 +58,7 @@ class GasStationResource extends Resource
                 TextColumn::make('refuelings_sum_amount')
                     ->label('Aktueller Füllstand')
                     ->alignRight()
+                    ->numeric()
                     ->sum('refuelings', 'amount')
                     ->suffix(' l'),
             ])
