@@ -81,7 +81,7 @@ class Refueling extends Model
             'callsign' => $this->buyer_registration,
             'memberid' => $this->user?->memberid,
             'counter' => $this->counter_reading,
-            'comment' => "Intranet-Buchung {$this->id}",
+            'comment' => "Intranet-Vorgang {$this->id}",
         ]);
 
         if ($success) {
