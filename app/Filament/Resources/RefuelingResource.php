@@ -131,8 +131,13 @@ class RefuelingResource extends Resource
                     ->label('Kennzeichen'),
                 TextColumn::make('buyer_name')
                     ->label('Name'),
+                TextColumn::make('counter_reading')
+                    ->numeric(0, null, '.')
+                    ->alignRight()
+                    ->label('Zählerstand'),
                 TextColumn::make('amount')
                     ->label('Menge')
+                    ->alignRight()
                     ->numeric()
                     ->color(function (Refueling $record, $state) {
                         if ($record->amount < 0) {

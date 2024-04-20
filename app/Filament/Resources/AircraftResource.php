@@ -31,7 +31,7 @@ class AircraftResource extends Resource
                     ->label('Wie wird der Ölstand gemessen?')
                     ->required()
                     ->options(OilLevelType::class),
-                    Toggle::make('owned')
+                Toggle::make('owned')
                     ->label('Gehört dem Verein'),
             ]);
     }
