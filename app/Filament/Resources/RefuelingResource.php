@@ -17,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class RefuelingResource extends Resource
@@ -147,7 +148,9 @@ class RefuelingResource extends Resource
                     ->suffix(' l'),
             ])
             ->filters([
-                //
+                SelectFilter::make('gas_station_id')
+                    ->options(GasStation::pluck('name', 'id'))
+                    ->label('Tankstelle'),
             ])
             ->actions([
                 Action::make('send_vf')
@@ -193,7 +196,8 @@ class RefuelingResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->paginationPageOptions([50, 100, 250]);
     }
 
     public static function getPages(): array
