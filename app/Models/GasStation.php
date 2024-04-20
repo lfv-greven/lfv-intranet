@@ -33,6 +33,6 @@ class GasStation extends Model
 
     public function getCurrentCounterReading(): int
     {
-        return $this->refuelings()->first()?->counter_reading ?? 0;
+        return $this->refuelings()->orderByDesc('date')->first()?->counter_reading ?? 0;
     }
 }

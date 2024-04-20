@@ -136,6 +136,11 @@ class RefuelingResource extends Resource
                     ->numeric(0, null, '.')
                     ->alignRight()
                     ->label('Zählerstand'),
+                TextColumn::make('previous_diff')
+                    ->getStateUsing(fn ($record) => ($record->previous?->counter_reading - $record->counter_reading) - $record->amount)
+                    ->numeric(0, null, '.')
+                    ->alignRight()
+                    ->label('Diff'),
                 TextColumn::make('amount')
                     ->label('Menge')
                     ->alignRight()
