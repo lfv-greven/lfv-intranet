@@ -129,10 +129,12 @@ class RefuelingPage extends Component implements HasForms
 
                 TextInput::make('buyer_registration')
                     ->label('Kennzeichen')
+                    ->placeholder('D-EABC')
                     ->required(),
 
                 TextInput::make('counter_reading')
                     ->label('Zählerstand nach Betankung')
+                    ->helperText('Lies den Zählerstand nach Abschluss der Betankung ab.')
                     ->required()
                     ->minValue(0)
                     ->numeric()
@@ -151,13 +153,15 @@ class RefuelingPage extends Component implements HasForms
 
                 TextInput::make('amount')
                     ->label('Getankte Menge')
+                    ->helperText('Wird automatisch berechnet. Falls der berechnete Wert nicht passt, kann er manuell korrigiert werden.')
                     ->required()
                     ->minValue(0)
                     ->numeric()
                     ->suffix(' l'),
 
                 Textarea::make('comment')
-                    ->label('Hinweis')
+                    ->label('Hinweis / Notizen')
+                    ->placeholder('optional')
                     ->columnSpanFull(),
             ]);
     }
