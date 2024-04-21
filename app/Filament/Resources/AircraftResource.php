@@ -11,6 +11,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -32,7 +33,12 @@ class AircraftResource extends Resource
                     ->required()
                     ->options(OilLevelType::class),
                 Toggle::make('owned')
+                    ->live()
                     ->label('Gehört dem Verein'),
+                TextInput::make('billing_memberid')
+                    ->hidden(fn ($get) => $get('owned'))
+                    ->placeholder('Optional. Standardmäßig wird der aktuelle Pilot genutzt.')
+                    ->label('Abrechnung über Mitgliedsnummer'),
             ]);
     }
 
@@ -41,7 +47,13 @@ class AircraftResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('registration'),
+                IconColumn::make('owned')
+                    ->label('Vereinsflugzeug')
+                    ->boolean(),
+                TextColumn::make('billing_memberid')
+                    ->label('Abrechnung'),
                 TextColumn::make('oil_level')
+                    ->alignRight()
                     ->numeric()
                     ->getStateUsing(fn ($record) => $record->getOilLevel())
                     ->suffix(fn ($record) => match ($record->oil_level_type) {

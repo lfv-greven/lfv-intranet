@@ -14,6 +14,7 @@ class Aircraft extends Model
     use HasUlids;
 
     protected $fillable = [
+        'billing_memberid',
         'registration',
         'oil_level_type',
         'owned',

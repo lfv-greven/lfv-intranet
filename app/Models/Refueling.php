@@ -82,14 +82,19 @@ class Refueling extends Model
     {
         $vf = auth()->user()->vf();
 
+        $comment = "Intranet-Vorgang: {$this->id}";
+        if ($this->aircraft->billing_memberid) {
+            $comment .= " | Pilot: {$this->buyer_name}";
+        }
+
         $success = $vf->InsertSale([
             'bookingdate' => $this->date->format('Y-m-d'),
             'articleid' => $this->gasStation->vf_articleid,
             'amount' => abs($this->amount),
             'callsign' => $this->buyer_registration,
-            'memberid' => $this->user?->memberid,
+            'memberid' => $this->aircraft->billing_memberid ?? $this->user?->memberid,
             'counter' => $this->counter_reading,
-            'comment' => "Intranet-Vorgang {$this->id}",
+            'comment' => $comment,
         ]);
 
         if ($success) {
