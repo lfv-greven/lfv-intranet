@@ -13,7 +13,8 @@
         "filament/forms": "^3.2",
         "filament/notifications": "^3.2",
         "laravel/framework": "^11.0",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "larabug/larabug": "dev-master"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -68,6 +69,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "beta",
     "prefer-stable": true
 }

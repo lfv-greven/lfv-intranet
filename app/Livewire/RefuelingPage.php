@@ -130,7 +130,7 @@ class RefuelingPage extends Component implements HasForms
                     ]),
 
                 TextInput::make('buyer_registration')
-                    ->disabled(fn($get) => $get('aircraft_id'))
+                    ->disabled(fn ($get) => $get('aircraft_id'))
                     ->label('Kennzeichen')
                     ->placeholder('D-EABC')
                     ->required(),

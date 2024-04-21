@@ -65,6 +65,10 @@ return [
             'replace_placeholders' => true,
         ],
 
+        'larabug' => [
+            'driver' => 'larabug',
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
