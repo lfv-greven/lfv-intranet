@@ -14,28 +14,13 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Arr;
 use Livewire\Component;
 
 class RefuelingPage extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public $gas_station_id;
-
-    public $date;
-
-    public $aircraft_id;
-
-    public $buyer_registration;
-
-    public $buyer_name;
-
-    public $counter_reading;
-
-    public $amount;
-
-    public $comment;
+    public array $data = [];
 
     public function mount()
     {
@@ -51,19 +36,20 @@ class RefuelingPage extends Component implements HasForms
             return;
         }
 
-        $data = $this->form->getState();
+        $data = fluent($this->form->getState());
+        $reg = $data->buyer_registration ?? Aircraft::find($data->aircraft_id)->registration;
 
         Refueling::create([
             'user_id' => auth()->id(),
             'type' => RefuelingType::refueling,
-            'gas_station_id' => $data['gas_station_id'],
-            'date' => $data['date'],
-            'aircraft_id' => $data['aircraft_id'],
-            'buyer_registration' => data_get($data, 'buyer_registration'),
-            'buyer_name' => $data['buyer_name'],
-            'counter_reading' => $data['counter_reading'],
-            'amount' => $data['amount'],
-            'comment' => $data['comment'],
+            'gas_station_id' => $data->gas_station_id,
+            'date' => $data->date,
+            'aircraft_id' => $data->aircraft_id,
+            'buyer_name' => $data->buyer_name,
+            'buyer_registration' => $reg,
+            'counter_reading' => $data->counter_reading,
+            'amount' => $data->amount,
+            'comment' => $data->comment,
         ]);
 
         Notification::make()
@@ -77,22 +63,13 @@ class RefuelingPage extends Component implements HasForms
     public function form(Form $form): Form
     {
         return $form
+            ->statePath('data')
             ->columns(2)
             ->schema([
                 Select::make('gas_station_id')
                     ->required()
                     ->placeholder('Wähle die Tankstelle')
                     ->label('Tankstelle')
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set) {
-                        if (! $state) {
-                            return;
-                        }
-
-                        $gasStation = GasStation::findOrFail($state);
-
-                        $set('counter_reading', $gasStation->getCurrentCounterReading());
-                    })
                     ->options(GasStation::pluck('name', 'id')),
 
                 DateTimePicker::make('date')
