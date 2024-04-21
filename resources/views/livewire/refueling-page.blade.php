@@ -1,6 +1,11 @@
 <div>
     <h1>Tanken erfassen</h1>
 
+    <x-ui.alert class="my-6">
+        <strong>Probleme bei der Eingabe?</strong>
+        <u>Zählerstand</u> oder Foto und <u>Kennzeichen</u> an info@sportflugzentrum.de senden und die Daten werden nachgetragen!
+    </x-ui.alert>
+
     <form class="my-10" wire:submit.prevent="save">
         {{ $this->form }}
 
