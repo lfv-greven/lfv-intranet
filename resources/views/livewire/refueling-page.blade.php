@@ -1,5 +1,5 @@
 <div>
-    <h1>Tanken erfassen</h1>
+    <h1>Tankvorgang erfassen</h1>
 
     <x-ui.alert class="my-6">
         <strong>Probleme bei der Eingabe?</strong>

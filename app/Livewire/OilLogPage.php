@@ -74,7 +74,8 @@ class OilLogPage extends Component implements HasForms
 
                 Select::make('aircraft_id')
                     ->required()
-                    ->label('Flugzeug')
+                    ->label('Flugzeug wählen')
+                    ->placeholder('Bitte wählen')
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
                         if (! $state) {

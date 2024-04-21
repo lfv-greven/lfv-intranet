@@ -80,6 +80,7 @@ class RefuelingPage extends Component implements HasForms
             ->schema([
                 Select::make('gas_station_id')
                     ->required()
+                    ->placeholder('Wähle die Tankstelle')
                     ->label('Tankstelle')
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
@@ -111,6 +112,7 @@ class RefuelingPage extends Component implements HasForms
                     ->required(),
 
                 Select::make('aircraft_id')
+                    ->placeholder('Fremdes LFZ/KFZ')
                     ->label('Flugzeug')
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
@@ -128,6 +130,7 @@ class RefuelingPage extends Component implements HasForms
                     ]),
 
                 TextInput::make('buyer_registration')
+                    ->disabled(fn($get) => $get('aircraft_id'))
                     ->label('Kennzeichen')
                     ->placeholder('D-EABC')
                     ->required(),
