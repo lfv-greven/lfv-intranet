@@ -14,6 +14,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Arr;
 use Livewire\Component;
 
 class RefuelingPage extends Component implements HasForms
@@ -58,7 +59,7 @@ class RefuelingPage extends Component implements HasForms
             'gas_station_id' => $data['gas_station_id'],
             'date' => $data['date'],
             'aircraft_id' => $data['aircraft_id'],
-            'buyer_registration' => $data['buyer_registration'],
+            'buyer_registration' => data_get($data, 'buyer_registration'),
             'buyer_name' => $data['buyer_name'],
             'counter_reading' => $data['counter_reading'],
             'amount' => $data['amount'],
