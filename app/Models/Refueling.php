@@ -50,6 +50,11 @@ class Refueling extends Model
         ];
     }
 
+    public function scopeRefueling($q)
+    {
+        $q->where('type', RefuelingType::refueling);
+    }
+
     public function gasStation()
     {
         return $this->belongsTo(GasStation::class);
