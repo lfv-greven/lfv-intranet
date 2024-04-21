@@ -162,7 +162,7 @@ class RefuelingResource extends Resource
                     ->icon('heroicon-s-banknotes')
                     ->iconButton()
                     ->tooltip('Verkauf an Vereinsflieger übertragen')
-                    ->visible(fn ($record) => $record->type == RefuelingType::refueling)
+                    ->visible(fn ($record) => $record->type == RefuelingType::refueling && !$record->aircraft?->owned)
                     ->disabled(function (Refueling $record) {
                         if ($record->isExported()) {
                             return true;

@@ -88,7 +88,7 @@ class Refueling extends Model
         $vf = auth()->user()->vf();
 
         $comment = "Intranet-Vorgang: {$this->id}";
-        if ($this->aircraft->billing_memberid) {
+        if ($this->aircraft?->billing_memberid) {
             $comment .= " | Pilot: {$this->buyer_name}";
         }
 
@@ -97,7 +97,7 @@ class Refueling extends Model
             'articleid' => $this->gasStation->vf_articleid,
             'amount' => abs($this->amount),
             'callsign' => $this->buyer_registration,
-            'memberid' => $this->aircraft->billing_memberid ?? $this->user?->memberid,
+            'memberid' => $this->aircraft?->billing_memberid ?? $this->user?->memberid,
             'counter' => $this->counter_reading,
             'comment' => $comment,
         ]);
