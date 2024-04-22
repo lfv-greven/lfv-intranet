@@ -32,10 +32,17 @@ class Refueling extends Model
         parent::boot();
 
         static::saving(function ($refueling) {
+            // Make amount positive or negative, depending on type
             if ($refueling->type == RefuelingType::refueling) {
                 $refueling->amount = -abs($refueling->amount);
             } elseif ($refueling->type == RefuelingType::filling) {
                 $refueling->amount = abs($refueling->amount);
+            }
+
+            // Be sure to map refueling to a stored aircraft if possible
+            if (blank($refueling->aircraft_id)) {
+                // Double check if that aircraft does not exist locally
+                $refueling->aircraft_id = Aircraft::whereRegistration($refueling->buyer_registration)->first()?->id;
             }
         });
     }

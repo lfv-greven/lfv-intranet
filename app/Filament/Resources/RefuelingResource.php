@@ -129,6 +129,8 @@ class RefuelingResource extends Resource
                     ->label('Datum')
                     ->date('d.m.Y'),
                 TextColumn::make('buyer_registration')
+                    ->badge(fn ($record) => filled($record->aircraft_id))
+                    ->color('gray')
                     ->label('Kennzeichen'),
                 TextColumn::make('buyer_name')
                     ->label('Name'),
@@ -162,7 +164,7 @@ class RefuelingResource extends Resource
                     ->icon('heroicon-s-banknotes')
                     ->iconButton()
                     ->tooltip('Verkauf an Vereinsflieger übertragen')
-                    ->visible(fn ($record) => $record->type == RefuelingType::refueling && !$record->aircraft?->owned)
+                    ->visible(fn ($record) => $record->type == RefuelingType::refueling && ! $record->aircraft?->owned)
                     ->disabled(function (Refueling $record) {
                         if ($record->isExported()) {
                             return true;
