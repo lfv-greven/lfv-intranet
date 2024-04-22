@@ -110,6 +110,8 @@ class RefuelingResource extends Resource
                     ->suffix(' l'),
 
                 TextInput::make('amount')
+                    ->label('Menge')
+                    ->formatStateUsing(fn ($state) => abs($state))
                     ->required()
                     ->minValue(0)
                     ->numeric()
@@ -181,7 +183,7 @@ class RefuelingResource extends Resource
                                 ->title('Verkauf wurde erfolgreich übertragen.')
                                 ->send();
 
-                            if (! $record->user_id) {
+                            if (! $record->user_id && ! $record->aircraft?->billing_memberid) {
                                 Notification::make()
                                     ->warning()
                                     ->title('Wichtig!')
