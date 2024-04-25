@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 
 class AircraftResource extends Resource
@@ -45,6 +46,18 @@ class AircraftResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultGroup('owned')
+            ->groupingSettingsHidden()
+            ->groups([
+                Group::make('owned')
+                    ->label('Status')
+                    ->orderQueryUsing(fn ($query) => $query->orderBy('owned', 'desc'))
+                    ->collapsible()
+                    ->getTitleFromRecordUsing(fn ($record) => match ($record->owned) {
+                        true => 'Vereinsflugzeug',
+                        false => 'Privat',
+                    }),
+            ])
             ->columns([
                 TextColumn::make('registration'),
                 IconColumn::make('owned')
