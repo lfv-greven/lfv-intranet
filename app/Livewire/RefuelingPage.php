@@ -119,7 +119,7 @@ class RefuelingPage extends Component implements HasForms
                     ->required()
                     ->minValue(0)
                     ->numeric()
-                    ->live()
+                    ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, $set, $get, $operation) {
                         $gasStationId = $get('gas_station_id');
                         if (! $gasStationId) {
