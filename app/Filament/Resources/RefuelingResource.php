@@ -141,7 +141,10 @@ class RefuelingResource extends Resource
                     ->alignRight()
                     ->label('Zählerstand'),
                 TextColumn::make('previous_diff')
-                    ->getStateUsing(fn ($record) => ($record->previous?->counter_reading - $record->counter_reading) - $record->amount)
+                    ->getStateUsing(fn ($record) => match($record->type) {
+                        RefuelingType::filling => '',
+                        RefuelingType::refueling => ($record->previous?->counter_reading - $record->counter_reading) - $record->amount,
+                    })
                     ->numeric(0, null, '.')
                     ->alignRight()
                     ->label('Diff'),
