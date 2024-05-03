@@ -141,13 +141,20 @@ class RefuelingResource extends Resource
                     ->alignRight()
                     ->label('Zählerstand'),
                 TextColumn::make('previous_diff')
-                    ->getStateUsing(fn ($record) => match($record->type) {
+                    ->getStateUsing(fn ($record) => match ($record->type) {
                         RefuelingType::filling => '',
                         RefuelingType::refueling => ($record->previous?->counter_reading - $record->counter_reading) - $record->amount,
                     })
                     ->numeric(0, null, '.')
                     ->alignRight()
                     ->label('Diff'),
+                TextColumn::make('fill_level')
+                    ->label('Füllstand')
+                    ->getStateUsing(fn ($record) => $record->gasStation->refuelings()->orderByDesc('date')->where('date', '<=', $record->date)->sum('amount'))
+                    ->numeric(0, null, '.')
+                    ->suffix(' l')
+                    ->alignRight()
+                    ->toggleable(),
                 TextColumn::make('amount')
                     ->label('Menge')
                     ->alignRight()
