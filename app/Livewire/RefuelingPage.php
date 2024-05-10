@@ -76,7 +76,7 @@ class RefuelingPage extends Component implements HasForms
                     ->native(false)
                     ->displayFormat('d.m.Y H:i')
                     ->seconds(false)
-                    ->label('Datum')
+                    ->label('Zeitpunkt der Betankung')
                     ->required()
                     ->maxDate(now())
                     ->minDate(today()->startOfMonth())
