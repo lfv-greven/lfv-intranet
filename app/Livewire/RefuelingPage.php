@@ -14,6 +14,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Number;
 use Livewire\Component;
 
 class RefuelingPage extends Component implements HasForms
@@ -68,8 +69,20 @@ class RefuelingPage extends Component implements HasForms
             ->schema([
                 Select::make('gas_station_id')
                     ->required()
-                    ->placeholder('Wähle die Tankstelle')
+                    ->placeholder('')
                     ->label('Tankstelle')
+                    ->live()
+                    ->helperText(function ($state) {
+                        if (! $state) {
+                            return;
+                        }
+
+                        $filling = GasStation::withSum('refuelings', 'amount')
+                            ->find($state)
+                            ->refuelings_sum_amount;
+
+                        return 'Aktueller Füllstand: '.Number::format($filling, locale: 'de').' L';
+                    })
                     ->options(GasStation::pluck('name', 'id')),
 
                 DateTimePicker::make('date')
@@ -85,7 +98,7 @@ class RefuelingPage extends Component implements HasForms
                 TextInput::make('buyer_name')
                     ->placeholder('Max Mustermann')
                     ->label('Name')
-                    ->label('Pilot')
+                    ->label('Name des Piloten')
                     ->columnSpanFull()
                     ->required(),
 
