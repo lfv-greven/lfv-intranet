@@ -7,22 +7,32 @@
 @php
 $border = match($type) {
     'info' => 'border-blue-400',
+    'error' => 'border-red-400',
+    'success' => 'border-green-400',
 };
 
 $bg = match($type) {
     'info' => 'bg-blue-50',
+    'error' => 'bg-red-50',
+    'success' => 'bg-green-50',
 };
 
 $text = match($type) {
     'info' => 'text-blue-700',
+    'error' => 'text-red-700',
+    'success' => 'text-green-700',
 };
 
 $iconColor= match($type) {
     'info' => 'text-blue-400',
+    'error' => 'text-red-400',
+    'success' => 'text-green-400',
 };
 
 $defaultIcon= match($type) {
     'info' => 'heroicon-s-information-circle',
+    'error' => 'heroicon-s-exclamation-circle',
+    'success' => 'heroicon-s-check-circle',
 };
 @endphp
 

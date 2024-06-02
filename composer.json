@@ -12,12 +12,14 @@
         "filament/filament": "^3.2",
         "filament/forms": "^3.2",
         "filament/notifications": "^3.2",
+        "larabug/larabug": "dev-master",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
-        "larabug/larabug": "dev-master"
+        "wire-elements/modal": "^2.0"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel-lang/lang": "^15.4",
         "laravel/pint": "^1.15",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
