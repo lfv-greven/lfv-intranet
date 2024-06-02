@@ -17,6 +17,7 @@ class OilLog extends Model
         'pilot',
         'registration',
         'oil_level',
+        'oil_refilled',
     ];
 
     protected function casts()

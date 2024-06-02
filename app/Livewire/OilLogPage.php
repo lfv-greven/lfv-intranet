@@ -51,6 +51,7 @@ class OilLogPage extends Component implements HasForms
             'pilot' => $data['pilot'],
             'registration' => $aircraft->registration,
             'oil_level' => $data['oil_level'],
+            'oil_refilled' => $data['oil_refilled'],
         ]);
 
         Notification::make()
