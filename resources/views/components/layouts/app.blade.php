@@ -39,5 +39,6 @@
 
     @livewire('notifications')
     @filamentScripts
+    @livewire('wire-elements-modal')
 </body>
 </html>

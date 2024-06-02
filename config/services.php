@@ -19,6 +19,10 @@ return [
         'cid' => env('VF_CID'),
     ],
 
+    'tasks' => [
+        'url' => 'https://d1phq4qhqf.execute-api.eu-central-1.amazonaws.com/',
+    ],
+
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],

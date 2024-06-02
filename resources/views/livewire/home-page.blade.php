@@ -23,6 +23,10 @@
         <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.png')" :external="$isIframe">
             Ölstand erfassen
         </x-home.menu-link>
+
+        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.png')" :external="$isIframe">
+            LfV-Chat
+        </x-home.menu-link>
     </div>
 
     @auth

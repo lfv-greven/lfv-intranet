@@ -17,3 +17,9 @@ div.container {
 a.link {
     @apply font-bold hover:underline text-sm text-primary;
 }
+
+table {
+    th {
+        @apply text-left;
+    }
+}
