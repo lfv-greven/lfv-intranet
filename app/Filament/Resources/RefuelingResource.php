@@ -129,7 +129,7 @@ class RefuelingResource extends Resource
             ->columns([
                 TextColumn::make('date')
                     ->label('Datum')
-                    ->date('d.m.Y'),
+                    ->date('d.m.Y H:i'),
                 TextColumn::make('buyer_registration')
                     ->badge(fn ($record) => filled($record->aircraft_id))
                     ->color('gray')
