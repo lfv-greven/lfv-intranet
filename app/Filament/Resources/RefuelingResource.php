@@ -19,6 +19,7 @@ use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class RefuelingResource extends Resource
 {
@@ -126,6 +127,12 @@ class RefuelingResource extends Resource
     {
         return $table
             ->defaultSort('date', 'desc')
+            ->modifyQueryUsing(function ($query) {
+                return $query
+                    ->select()
+                    ->addSelect(DB::raw('(SELECT SUM(amount) FROM refuelings r2 WHERE refuelings.gas_station_id = r2.gas_station_id AND refuelings.date >= r2.date) AS fill_level'))
+                    ->addSelect(DB::raw('CASE WHEN type = "filling" THEN NULL ELSE LAG(counter_reading) OVER (partition by gas_station_id order by date asc) - counter_reading - amount END AS diff'));
+            })
             ->columns([
                 TextColumn::make('date')
                     ->label('Datum')
@@ -140,17 +147,12 @@ class RefuelingResource extends Resource
                     ->numeric(0, null, '.')
                     ->alignRight()
                     ->label('Zählerstand'),
-                TextColumn::make('previous_diff')
-                    ->getStateUsing(fn ($record) => match ($record->type) {
-                        RefuelingType::filling => '',
-                        RefuelingType::refueling => ($record->previous?->counter_reading - $record->counter_reading) - $record->amount,
-                    })
+                TextColumn::make('diff')
                     ->numeric(0, null, '.')
                     ->alignRight()
                     ->label('Diff'),
                 TextColumn::make('fill_level')
                     ->label('Füllstand')
-                    ->getStateUsing(fn ($record) => $record->gasStation->refuelings()->orderByDesc('date')->where('date', '<=', $record->date)->sum('amount'))
                     ->numeric(0, null, '.')
                     ->suffix(' l')
                     ->alignRight()

@@ -77,14 +77,6 @@ class Refueling extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function previous()
-    {
-        return $this
-            ->hasOne(static::class, 'gas_station_id', 'gas_station_id')
-            ->where('date', '<', $this->date)
-            ->orderByDesc('date');
-    }
-
     public function isExported()
     {
         return filled($this->vf_exported_at);
