@@ -11,6 +11,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Grouping\Group;
@@ -21,6 +22,10 @@ class AircraftResource extends Resource
     protected static ?string $model = Aircraft::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationLabel = 'Flotte';
+
+    protected static ?string $navigationGroup = 'Flugbetrieb';
 
     public static function form(Form $form): Form
     {
@@ -79,8 +84,25 @@ class AircraftResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Action::make('csv_export')
+                    ->tooltip('Ölbuch herunterladen')
+                    ->iconButton()
+                    ->icon('heroicon-s-table-cells')
+                    ->action(function (Aircraft $record) {
+                        return response()->streamDownload(function () use ($record) {
+                            echo 'Datum,Ölstand,Nachgefüllt'.PHP_EOL;
+
+                            foreach ($record->oilLogs()->orderBy('created_at', 'asc')->lazy() as $log) {
+                                echo implode(',', [
+                                    $log->created_at->toIso8601String(),
+                                    $log->oil_level,
+                                    $log->oil_refilled,
+                                ]).PHP_EOL;
+                            }
+                        }, "Ölbuch {$record->registration}.csv");
+                    }),
+                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\DeleteAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
