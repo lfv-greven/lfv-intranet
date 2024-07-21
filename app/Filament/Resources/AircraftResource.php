@@ -64,7 +64,8 @@ class AircraftResource extends Resource
                     }),
             ])
             ->columns([
-                TextColumn::make('registration'),
+                TextColumn::make('registration')
+                    ->searchable(),
                 IconColumn::make('owned')
                     ->label('Vereinsflugzeug')
                     ->boolean(),
