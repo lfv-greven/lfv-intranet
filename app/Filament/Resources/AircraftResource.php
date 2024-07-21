@@ -88,6 +88,7 @@ class AircraftResource extends Resource
                 Action::make('csv_export')
                     ->tooltip('Ölbuch herunterladen')
                     ->iconButton()
+                    ->visible(fn (Aircraft $record) => $record->owned)
                     ->icon('heroicon-s-table-cells')
                     ->action(function (Aircraft $record) {
                         return response()->streamDownload(function () use ($record) {
