@@ -149,6 +149,7 @@ class RefuelingResource extends Resource
                     ->label('Zählerstand'),
                 TextColumn::make('diff')
                     ->numeric(0, null, '.')
+                    ->color(fn ($state) => $state < 0 ? 'danger' : null)
                     ->alignRight()
                     ->label('Diff'),
                 TextColumn::make('fill_level')

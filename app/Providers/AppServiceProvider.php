@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger());
+        $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger);
     }
 
     /**
