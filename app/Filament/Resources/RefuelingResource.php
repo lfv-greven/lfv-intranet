@@ -126,12 +126,12 @@ class RefuelingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('date', 'desc')
+            ->defaultSort('counter_reading', 'desc')
             ->modifyQueryUsing(function ($query) {
                 return $query
                     ->select()
-                    ->addSelect(DB::raw('(SELECT SUM(amount) FROM refuelings r2 WHERE refuelings.gas_station_id = r2.gas_station_id AND refuelings.date >= r2.date) AS fill_level'))
-                    ->addSelect(DB::raw('CASE WHEN type = "filling" THEN NULL ELSE LAG(counter_reading) OVER (partition by gas_station_id order by date asc) - counter_reading - amount END AS diff'));
+                    ->addSelect(DB::raw('(SELECT SUM(amount) FROM refuelings r2 WHERE refuelings.gas_station_id = r2.gas_station_id AND refuelings.counter_reading >= r2.counter_reading) AS fill_level'))
+                    ->addSelect(DB::raw('CASE WHEN type = "filling" THEN NULL ELSE LAG(counter_reading) OVER (partition by gas_station_id order by counter_reading asc) - counter_reading - amount END AS diff'));
             })
             ->columns([
                 TextColumn::make('date')
