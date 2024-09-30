@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Enums\RefuelingType;
 use App\Filament\Resources\RefuelingResource\Pages;
+use App\Jobs\Vf\SendRefueling;
 use App\Models\Aircraft;
 use App\Models\GasStation;
 use App\Models\Refueling;
@@ -190,26 +191,12 @@ class RefuelingResource extends Resource
                         return false;
                     })
                     ->action(function (Refueling $record) {
-                        if ($record->vfExport()) {
-                            Notification::make()
-                                ->success()
-                                ->title('Verkauf wurde erfolgreich übertragen.')
-                                ->send();
+                        SendRefueling::dispatch($record);
 
-                            if (! $record->user_id && ! $record->aircraft?->billing_memberid) {
-                                Notification::make()
-                                    ->warning()
-                                    ->title('Wichtig!')
-                                    ->body('Der Nutzer war nicht eingeloggt, daher muss im Vereinsflieger noch ein Käufer eingetragen werden.')
-                                    ->send();
-                            }
-                        } else {
-                            Notification::make()
-                                ->danger()
-                                ->title('Fehler')
-                                ->body('Verkauf konnte wegen eines Fehlers nicht an den Vereinsflieger gesendet werden')
-                                ->send();
-                        }
+                        Notification::make()
+                            ->success()
+                            ->title('Verkauf wird im Hintergrund übertragen.')
+                            ->send();
                     }),
                 Tables\Actions\EditAction::make()->iconButton(),
                 Tables\Actions\DeleteAction::make()->iconButton(),

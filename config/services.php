@@ -17,6 +17,8 @@ return [
     'vereinsflieger' => [
         'key' => env('VF_APPKEY'),
         'cid' => env('VF_CID'),
+        'username' => env('VF_USERNAME'),
+        'password' => env('VF_PASSWORD'),
     ],
 
     'tasks' => [

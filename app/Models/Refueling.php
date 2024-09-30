@@ -84,7 +84,7 @@ class Refueling extends Model
 
     public function vfExport(): bool
     {
-        $vf = auth()->user()->vf();
+        $vf = app()->make('vfadmin');
 
         $comment = "Intranet-Vorgang: {$this->id}";
         if ($this->aircraft?->billing_memberid) {

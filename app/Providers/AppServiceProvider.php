@@ -17,6 +17,15 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger);
+        $this->app->singleton('vfadmin', function () {
+            $vf = new Vereinsflieger;
+            $vf->SignIn(
+                config('services.vereinsflieger.username'),
+                config('services.vereinsflieger.password'),
+            );
+
+            return $vf;
+        });
     }
 
     /**
