@@ -10,11 +10,6 @@
         @endauth
     </div>
 
-    <x-ui.alert class="mb-6">
-        <strong>Update des Tankbuchs:</strong>
-        Bei Problemen, Fragen oder Anregungen Mail an info@sportflugzentrum.de. Danke!
-    </x-ui.alert>
-
     <div class="space-y-6">
         <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')" :external="$isIframe">
             Tanken erfassen
