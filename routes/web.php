@@ -12,6 +12,7 @@ Route::redirect('/', '/login');
 
 Route::get('/home', HomePage::class)->name('home');
 Route::get('/tanken', RefuelingPage::class)->name('refueling');
+Route::get('/auslagen', \App\Livewire\ExpensesPage::class)->name('expenses');
 Route::get('/oil', OilLogPage::class)->name('oil');
 Route::get('/chat', ChatSettingsPage::class)->name('chat')->middleware('auth');
 

@@ -80,4 +80,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return new Vereinsflieger($this->vf_accesstoken);
     }
+
+    public function getVfUser(): array
+    {
+        return $this->vf()->GetUser();
+    }
 }
