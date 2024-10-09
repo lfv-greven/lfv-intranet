@@ -56,6 +56,7 @@ class User extends Authenticatable implements FilamentUser
             'password' => 'hashed',
             'vf_accesstoken' => 'encrypted',
             'roles' => 'collection',
+            'department_joined_at' => 'datetime',
         ];
     }
 
@@ -84,5 +85,10 @@ class User extends Authenticatable implements FilamentUser
     public function getVfUser(): array
     {
         return $this->vf()->GetUser();
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
     }
 }
