@@ -41,7 +41,23 @@ class DepartmentPage extends Component implements HasForms
                 Select::make('department_id')
                     ->required()
                     ->label('Abteilung')
-                    ->options(Department::orderBy('name')->get()->pluck('name', 'id')),
+                    ->disableOptionWhen(function (string $value) {
+                        $department = Department::find($value);
+
+                        return $department->free_seats < 1;
+                    })
+                    ->options(
+                        Department::orderBy('name')->withCount('users')->get()->mapWithKeys(function (Department $department) {
+                            return [
+                                $department->id => sprintf(
+                                    '%s (%s / %s)',
+                                    $department->name,
+                                    $department->users_count,
+                                    $department->max_members,
+                                ),
+                            ];
+                        })
+                    ),
             ]);
     }
 

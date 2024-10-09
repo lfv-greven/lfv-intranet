@@ -1,7 +1,7 @@
 <div class="max-w-screen-md mx-auto">
     <h1>Mein Engagement</h1>
     <p class="text-center my-4 text-sm">
-        Wähle dein Team aus, für das du dich Engagieren möchtest.
+        Wähle dein Team aus, für das du dich Engagieren möchtest. Eine Änderung ist immer zum Jahreswechsel möglich.
     </p>
 
     <form wire:submit.prevent="store">

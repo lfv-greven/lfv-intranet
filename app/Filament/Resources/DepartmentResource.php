@@ -50,7 +50,7 @@ class DepartmentResource extends Resource
                     ->label('Teilnhemer')
                     ->getStateUsing(fn (Department $record) => sprintf(
                         '%s/%s',
-                        0,
+                        $record->users()->count(),
                         $record->max_members,
                     ))
                     ->numeric(),
