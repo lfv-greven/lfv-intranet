@@ -47,11 +47,11 @@ class DepartmentPage extends Component implements HasForms
                     ->columns(1)
                     ->schema([
                         Select::make('department_id')
-                            ->placeholder('Wähle eine Abteilung')
+                            ->placeholder('Wähle ein Team')
                             ->required()
                             ->disabled(fn () => ! $this->canChange)
-                            ->helperText(fn () => $this->canChange ? '' : 'Das Ändern der Abteilung ist nur zum Jahresende möglich.')
-                            ->label('Abteilung')
+                            ->helperText(fn () => $this->canChange ? '' : 'Das Ändern deines Team ist nur zum Jahresende möglich.')
+                            ->label('Team')
                             ->disableOptionWhen(function (string $value) {
                                 $department = Department::find($value);
 
