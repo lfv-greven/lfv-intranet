@@ -33,7 +33,7 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
             $this->expense->user->name,
         ), function (Message $message) {
             $message->subject('Erstattung');
-            $message->to('belege@sportflugzentrum.de');
+            $message->to('kassierer@sportflugzentrum.de');
             $message->attachData(Storage::get($this->expense->expense_report_filename), basename($this->expense->expense_report_filename));
         });
     }
