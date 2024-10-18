@@ -33,9 +33,11 @@ class DepartmentPage extends Component implements HasForms
             'department_lead_interest' => $user->department_lead_interest,
         ]);
 
-        if ($user->department_id == null || ! $user->department_joined_at->isCurrentYear()) {
-            $this->canChange = true;
-        }
+        // Only for later, for now changing is fully open
+        $this->canChange = true;
+        //        if ($user->department_id == null || ! $user->department_joined_at->isCurrentYear()) {
+        //            $this->canChange = true;
+        //        }
     }
 
     public function form(Form $form): Form
