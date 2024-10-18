@@ -7,6 +7,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/css/pdf/expense-report.css',
+                'resources/css/pdf/department-descriptions.css',
                 'resources/js/app.js',
             ],
             refresh: true,

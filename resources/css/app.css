@@ -23,3 +23,7 @@ table {
         @apply text-left;
     }
 }
+
+a.link {
+    @apply text-primary font-bold;
+}

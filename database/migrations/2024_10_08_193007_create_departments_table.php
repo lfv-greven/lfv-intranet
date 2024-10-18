@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->string('name');
-            $table->unsignedInteger('max_members')->nullable();
+            $table->unsignedInteger('max_members');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

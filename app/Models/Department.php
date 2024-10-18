@@ -15,6 +15,7 @@ class Department extends Model
     protected $fillable = [
         'name',
         'max_members',
+        'description',
     ];
 
     public function users()

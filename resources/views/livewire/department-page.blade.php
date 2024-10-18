@@ -2,6 +2,7 @@
     <h1>Mein Engagement</h1>
     <p class="text-center my-4 text-sm">
         Wähle dein Team aus, für das du dich Engagieren möchtest. Eine Änderung ist immer zum Jahreswechsel möglich.
+        <a href="{{ route('department.descriptions-team') }}" target="_blank" class="link">Team-Beschreibungen ansehen</a>
     </p>
 
     @if(auth()->user()->department_id)

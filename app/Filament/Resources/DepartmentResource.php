@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Models\Department;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -35,7 +36,11 @@ class DepartmentResource extends Resource
                 TextInput::make('max_members')
                     ->label('Maximale Anzahl an Mitgliedern')
                     ->numeric()
+                    ->required()
                     ->minValue(0),
+                RichEditor::make('description')
+                    ->toolbarButtons(['bold', 'underline', 'italic'])
+                    ->label('Beschreibung'),
             ]);
     }
 
@@ -48,11 +53,13 @@ class DepartmentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('members')
                     ->label('Teilnhemer')
-                    ->getStateUsing(fn (Department $record) => sprintf(
-                        '%s/%s',
-                        $record->users()->count(),
-                        $record->max_members,
-                    ))
+                    ->getStateUsing(fn (Department $record) => $record->max_members == null
+                        ? $record->users()->count()
+                        : sprintf(
+                            '%s/%s',
+                            $record->users()->count(),
+                            $record->max_members,
+                        ))
                     ->numeric(),
             ])
             ->filters([
