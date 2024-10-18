@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
@@ -28,6 +29,8 @@ class DepartmentPage extends Component implements HasForms
 
         $this->form->fill([
             'department_id' => $user->department_id,
+            'department_note' => $user->department_note,
+            'department_lead_interest' => $user->department_lead_interest,
         ]);
 
         if ($user->department_id == null || ! $user->department_joined_at->isCurrentYear()) {
@@ -39,7 +42,6 @@ class DepartmentPage extends Component implements HasForms
     {
         return $form
             ->statePath('data')
-            ->disabled(fn () => ! $this->canChange)
             ->schema([
                 Fieldset::make('')
                     ->columns(1)
@@ -47,6 +49,8 @@ class DepartmentPage extends Component implements HasForms
                         Select::make('department_id')
                             ->placeholder('Wähle eine Abteilung')
                             ->required()
+                            ->disabled(fn () => ! $this->canChange)
+                            ->helperText(fn () => $this->canChange ? '' : 'Das Ändern der Abteilung ist nur zum Jahresende möglich.')
                             ->label('Abteilung')
                             ->disableOptionWhen(function (string $value) {
                                 $department = Department::find($value);
@@ -84,8 +88,15 @@ class DepartmentPage extends Component implements HasForms
         $user = auth()->user();
 
         $user->department_id = $this->data['department_id'];
+        $user->department_note = $this->data['department_note'];
+        $user->department_lead_interest = $this->data['department_lead_interest'];
         $user->department_joined_at = now();
         $user->save();
+
+        Notification::make()
+            ->success()
+            ->title('Änderungen wurden gespeichert.')
+            ->send();
 
         $this->canChange = false;
     }

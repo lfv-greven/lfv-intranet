@@ -16,6 +16,8 @@ return new class extends Migration
                 ->nullable()
                 ->constrained()->cascadeOnUpdate()->nullOnDelete();
             $table->datetime('department_joined_at')->nullable();
+            $table->text('department_note')->nullable();
+            $table->boolean('department_lead_interest')->default(false);
         });
     }
 
@@ -25,8 +27,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeignIdFor(\App\Models\Department::class);
-            $table->dropColumn('department_joined_at');
+            $table->dropConstrainedForeignIdFor(\App\Models\Department::class);
+            $table->dropColumn(['department_joined_at', 'department_note', 'department_lead_interest']);
         });
     }
 };

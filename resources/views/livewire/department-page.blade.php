@@ -4,10 +4,17 @@
         Wähle dein Team aus, für das du dich Engagieren möchtest. Eine Änderung ist immer zum Jahreswechsel möglich.
     </p>
 
+    @if(auth()->user()->department_id)
+        <div class="my-6 flex gap-4 items-center justify-center">
+            <img src="{{ Vite::asset('resources/images/icons/checked.png') }}" alt="Checked" class="w-12 h-12">
+            <span class="font-bold">Danke, dein Engagement wurde gespeichert!</span>
+        </div>
+    @endif
+
     <form wire:submit.prevent="store">
         {{ $this->form }}
 
-        <x-filament::button class="mt-4 w-full" type="submit" :disabled="!$canChange">
+        <x-filament::button class="mt-4 w-full" type="submit">
             Speichern
         </x-filament::button>
     </form>

@@ -10,7 +10,7 @@
         {{ $this->form }}
 
         <div class="mt-6">
-            <x-filament::button type="submit">
+            <x-filament::button type="submit" class="w-full">
                 Betankung speichern
             </x-filament::button>
         </div>
