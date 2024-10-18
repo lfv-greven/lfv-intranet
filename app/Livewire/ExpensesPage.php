@@ -17,7 +17,11 @@ class ExpensesPage extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public $data = [];
+    public array $data = [
+        'files' => [],
+        'is_paid' => false,
+        'is_correct_address' => false,
+    ];
 
     public $saved = false;
 
@@ -45,6 +49,7 @@ class ExpensesPage extends Component implements HasForms
     {
         return $form
             ->statePath('data')
+            ->model(Expense::class)
             ->schema([
                 Fieldset::make('Beleg')
                     ->columns(1)
@@ -57,9 +62,14 @@ class ExpensesPage extends Component implements HasForms
                             ->required()
                             ->name('file')
                             ->label('Belege')
+                            ->previewable(false)
                             ->hint('Du kannst mehrere Belege gleichzeitig hochladen.'),
                         Toggle::make('is_paid')
+                            ->accepted()
                             ->label('Ich bestätige, dass der Betrag bereits vollständig bezahlt ist und bitte um Erstattung auf mein Konto.'),
+                        Toggle::make('is_correct_address')
+                            ->accepted()
+                            ->label('Ich bestätige, dass die Rechnungsadresse unserer Vereinsadresse entspricht.'),
                     ]),
             ]);
     }
