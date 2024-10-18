@@ -7,6 +7,7 @@ use App\External\Vereinsflieger;
 use App\Models\User;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -40,5 +41,9 @@ class AppServiceProvider extends ServiceProvider
         FilamentColor::register([
             'primary' => '#F65812',
         ]);
+
+        Blade::if('admin', function () {
+            return auth()->check() && auth()->user()->isAdmin();
+        });
     }
 }

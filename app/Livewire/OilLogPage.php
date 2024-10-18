@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\OilLevelType;
 use App\Models\Aircraft;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -67,63 +68,65 @@ class OilLogPage extends Component implements HasForms
     {
         return $form
             ->schema([
+                Fieldset::make('')
+                    ->columns(1)
+                    ->schema([
+                        TextInput::make('pilot')
+                            ->required()
+                            ->placeholder('Max Mustermann')
+                            ->label('Pilot'),
 
-                TextInput::make('pilot')
-                    ->required()
-                    ->placeholder('Max Mustermann')
-                    ->label('Pilot'),
+                        Select::make('aircraft_id')
+                            ->required()
+                            ->label('Flugzeug wählen')
+                            ->placeholder('Bitte wählen')
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set) {
+                                if (! $state) {
+                                    return;
+                                }
 
-                Select::make('aircraft_id')
-                    ->required()
-                    ->label('Flugzeug wählen')
-                    ->placeholder('Bitte wählen')
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set) {
-                        if (! $state) {
-                            return;
-                        }
+                                $aircraft = Aircraft::findOrFail($state);
 
-                        $aircraft = Aircraft::findOrFail($state);
+                                $set('oil_level', $aircraft->getOilLevel());
+                                $this->oilLevelType = $aircraft->oil_level_type;
+                            })
+                            ->options(Aircraft::owned()->pluck('registration', 'id')),
 
-                        $set('oil_level', $aircraft->getOilLevel());
-                        $this->oilLevelType = $aircraft->oil_level_type;
-                    })
-                    ->options(Aircraft::owned()->pluck('registration', 'id')),
+                        TextInput::make('oil_level')
+                            ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)
+                            ->required()
+                            ->numeric()
+                            ->disabled(fn ($get) => blank($get('aircraft_id')))
+                            ->suffix(' qts')
+                            ->label('Ölstand')
+                            ->step(0.1),
 
-                TextInput::make('oil_level')
-                    ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)
-                    ->required()
-                    ->numeric()
-                    ->disabled(fn ($get) => blank($get('aircraft_id')))
-                    ->suffix(' qts')
-                    ->label('Ölstand')
-                    ->step(0.1),
+                        Radio::make('oil_level')
+                            ->visible(fn () => $this->oilLevelType == OilLevelType::relative)
+                            ->required()
+                            ->disabled(fn ($get) => blank($get('aircraft_id')))
+                            ->label('Ölstand')
+                            ->options([
+                                0 => 'min',
+                                25 => '1 / 4',
+                                50 => '1 / 2',
+                                75 => '3 / 4',
+                                100 => 'max',
+                            ]),
 
-                Radio::make('oil_level')
-                    ->visible(fn () => $this->oilLevelType == OilLevelType::relative)
-                    ->required()
-                    ->disabled(fn ($get) => blank($get('aircraft_id')))
-                    ->label('Ölstand')
-                    ->options([
-                        0 => 'min',
-                        25 => '1 / 4',
-                        50 => '1 / 2',
-                        75 => '3 / 4',
-                        100 => 'max',
+                        TextInput::make('oil_refilled')
+                            ->required()
+                            ->visible(fn ($get) => filled($get('aircraft_id')))
+                            ->suffix(fn () => match ($this->oilLevelType) {
+                                OilLevelType::absolute => ' qts',
+                                OilLevelType::relative => ' ml',
+                                default => null,
+                            })
+                            ->numeric()
+                            ->label('Menge, die du nachgefüllt hast')
+                            ->step(0.5),
                     ]),
-
-                TextInput::make('oil_refilled')
-                    ->required()
-                    ->visible(fn ($get) => filled($get('aircraft_id')))
-                    ->suffix(fn () => match ($this->oilLevelType) {
-                        OilLevelType::absolute => ' qts',
-                        OilLevelType::relative => ' ml',
-                        default => null,
-                    })
-                    ->numeric()
-                    ->label('Menge, die du nachgefüllt hast')
-                    ->step(0.5),
-
             ]);
     }
 

@@ -1,11 +1,11 @@
-<div>
+<div class="max-w-screen-md mx-auto">
     <h1>Ölstand erfassen</h1>
 
     <form class="my-10" wire:submit.prevent="save">
         {{ $this->form }}
 
         <div class="mt-6">
-            <x-filament::button type="submit">
+            <x-filament::button type="submit" class="w-full">
                 Ölstand erfassen
             </x-filament::button>
         </div>
