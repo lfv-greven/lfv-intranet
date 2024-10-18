@@ -37,7 +37,7 @@ class ExpensesPage extends Component implements HasForms
                 Expense::create([
                     'user_id' => auth()->id(),
                     'reason' => $this->data['reason'],
-                    'filename' => $filename,
+                    'receipt_filename' => $filename,
                 ]);
             }
         });

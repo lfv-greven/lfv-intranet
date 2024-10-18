@@ -70,7 +70,7 @@ class ExpenseResource extends Resource
                     ->button()
                     ->icon('heroicon-s-eye')
                     ->action(function ($record) {
-                        return Storage::download($record->filename);
+                        return Storage::download($record->receipt_filename, basename($record->receipt_filename));
                     }),
             ])
             ->bulkActions([

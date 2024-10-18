@@ -24,6 +24,9 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
+        GenerateExpenseReport::dispatchSync($this->expense);
+        $this->expense->refresh();
+
         Mail::raw(sprintf(
             "Erstattung ID: %s\nFür: %s",
             $this->expense->id,
@@ -31,7 +34,7 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
         ), function (Message $message) {
             $message->subject('Erstattung');
             $message->to('belege@sportflugzentrum.de');
-            $message->attachData(Storage::get($this->expense->filename), basename($this->expense->filename));
+            $message->attachData(Storage::get($this->expense->expense_report_filename), basename($this->expense->expense_report_filename));
         });
     }
 

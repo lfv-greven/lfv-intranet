@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.header {
+    @apply text-center font-bold text-4xl;
+}
+
+.subheader {
+    @apply text-center italic mb-10;
+}
+
+.content p {
+    @apply mb-2;
+}
+
+.content p strong {
+    @apply block;
+}
+
+.declaration {
+    @apply mt-10;
+}
+
+tr, th {
+    @apply text-left;
+}
+
+th {
+    @apply pr-4;
+}
+
+.meta {
+    @apply mt-20 text-xs;
+}

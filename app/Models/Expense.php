@@ -22,7 +22,7 @@ class Expense extends Model
     protected $fillable = [
         'user_id',
         'reason',
-        'filename',
+        'receipt_filename',
     ];
 
     protected $dispatchesEvents = [
@@ -39,7 +39,8 @@ class Expense extends Model
         });
 
         static::deleted(function (Expense $expense) {
-            Storage::delete($expense->filename);
+            Storage::delete($expense->receipt_filename);
+            Storage::delete($expense->expense_report_filename);
         });
     }
 
@@ -58,7 +59,7 @@ class Expense extends Model
     public function receiptUrl(): Attribute
     {
         return new Attribute(
-            get: fn () => Storage::url($this->filename),
+            get: fn () => Storage::url($this->receipt_filename),
         );
     }
 
