@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('receipt_filename');
             $table->string('expense_report_filename')->nullable();
             $table->string('iban', 34)->nullable();
-            $table->string('bic', 8)->nullable();
+            $table->string('bic', 11)->nullable();
             $table->timestamps();
         });
     }
