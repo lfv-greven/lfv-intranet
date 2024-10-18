@@ -19,13 +19,15 @@
             Ölstand erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')" :external="$isIframe">
-            Auslagenerstattung
-        </x-home.menu-link>
+        @admin
+            <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')" :external="$isIframe">
+                Auslagenerstattung
+            </x-home.menu-link>
 
-        <x-home.menu-link :href="route('department')" :icon_url="Vite::asset('resources/images/icons/teamwork.png')" :external="$isIframe">
-            Mein Engagement
-        </x-home.menu-link>
+            <x-home.menu-link :href="route('department')" :icon_url="Vite::asset('resources/images/icons/teamwork.png')" :external="$isIframe">
+                Mein Engagement
+            </x-home.menu-link>
+        @endadmin
 
         <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.png')" :external="$isIframe">
             LfV-Chat
