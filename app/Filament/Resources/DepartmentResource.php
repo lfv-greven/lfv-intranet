@@ -39,7 +39,7 @@ class DepartmentResource extends Resource
                     ->required()
                     ->minValue(0),
                 RichEditor::make('description')
-                    ->toolbarButtons(['bold', 'underline', 'italic'])
+                    ->toolbarButtons(['bold', 'underline', 'italic', 'bulletList', 'orderedList', 'undo', 'redo'])
                     ->label('Beschreibung'),
             ]);
     }
