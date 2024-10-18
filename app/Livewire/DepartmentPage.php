@@ -3,7 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Department;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -38,26 +41,36 @@ class DepartmentPage extends Component implements HasForms
             ->statePath('data')
             ->disabled(fn () => ! $this->canChange)
             ->schema([
-                Select::make('department_id')
-                    ->required()
-                    ->label('Abteilung')
-                    ->disableOptionWhen(function (string $value) {
-                        $department = Department::find($value);
+                Fieldset::make('')
+                    ->columns(1)
+                    ->schema([
+                        Select::make('department_id')
+                            ->placeholder('Wähle eine Abteilung')
+                            ->required()
+                            ->label('Abteilung')
+                            ->disableOptionWhen(function (string $value) {
+                                $department = Department::find($value);
 
-                        return $department->free_seats < 1;
-                    })
-                    ->options(
-                        Department::orderBy('name')->withCount('users')->get()->mapWithKeys(function (Department $department) {
-                            return [
-                                $department->id => sprintf(
-                                    '%s (%s / %s)',
-                                    $department->name,
-                                    $department->users_count,
-                                    $department->max_members,
-                                ),
-                            ];
-                        })
-                    ),
+                                return $department->free_seats < 1;
+                            })
+                            ->options(
+                                Department::orderBy('name')->withCount('users')->get()->mapWithKeys(function (Department $department) {
+                                    return [
+                                        $department->id => sprintf(
+                                            '%s (%s / %s)',
+                                            $department->name,
+                                            $department->users_count,
+                                            $department->max_members,
+                                        ),
+                                    ];
+                                })
+                            ),
+                        Textarea::make('department_note')
+                            ->label('Besondere Hinweise')
+                            ->hint('Wünsche, Interessen oder Qualifikationen.'),
+                        Toggle::make('department_lead_interest')
+                            ->label('Ich kann mir vorstellen, ein Team zu organisieren'),
+                    ]),
             ]);
     }
 
