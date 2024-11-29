@@ -5,9 +5,11 @@ namespace Database\Seeders;
 use App\Enums\FuelType;
 use App\Enums\RefuelingType;
 use App\Models\Aircraft;
+use App\Models\Department;
 use App\Models\GasStation;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 
 class DatabaseSeeder extends Seeder
 {
@@ -46,5 +48,25 @@ class DatabaseSeeder extends Seeder
 
         // Create some Aircraft
         Aircraft::factory()->times(10)->create();
+
+        // Create departments
+        $departments = [
+            'Außenanlagen',
+            'Checklisten',
+            'Clubheim',
+            'Events / Veranstaltungen',
+            'Fahrzeuge / Fuhrpark',
+            'Interieur / Nähteam',
+            'IT',
+            'Neumitglieder',
+            'Öffentlichkeitsarbeit',
+            'Piste / Flugbetriebsfläche',
+        ];
+
+        foreach ($departments as $department) {
+            Department::factory()->create([
+                'name' => $department,
+            ]);
+        }
     }
 }
