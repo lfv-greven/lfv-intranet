@@ -6,26 +6,39 @@ use App\Auth\VereinsfliegerUserProvider;
 use App\External\Vereinsflieger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class AuthController extends Controller
 {
-    public function vfLogin(Request $request)
+    public function vfIframe(Request $request)
     {
-        if (auth()->user()) {
-            return redirect()->route('home', ['iframe' => true]);
-        }
-
         $token = $request->get('accesstoken');
         $vf = app()->make(Vereinsflieger::class);
         $vfUser = $vf->IframeLogin($token);
 
-        if (! $vfUser) {
-            return redirect()->route('home', ['iframe' => true]);
+        $loginUrl = url('/');
+        if ($vfUser) {
+            $user = VereinsfliegerUserProvider::transformVfUser($vfUser);
+            $loginUrl = URL::temporarySignedRoute(
+                'auth.vf-login',
+                now()->addHour(),
+                ['uid' => $user->id],
+            );
         }
 
-        $user = VereinsfliegerUserProvider::transformVfUser($vfUser);
-        Auth::login($user, remember: true);
+        $vfUrl = 'https://vereinsflieger.de';
+        return response()
+            ->view('auth.vf-iframe', compact('loginUrl'))
+            ->header('X-Frame-Options', "ALLOW-FROM $vfUrl")
+            ->header('Content-Security-Policy', "frame-ancestors 'self' $vfUrl");
+    }
 
-        return redirect()->route('home', ['iframe' => true]);
+    public function vfLogin(Request $request)
+    {
+        abort_unless($request->hasValidSignature(), 403);
+
+        Auth::loginUsingId($request->get('uid'));
+
+        return redirect()->route('home');
     }
 }

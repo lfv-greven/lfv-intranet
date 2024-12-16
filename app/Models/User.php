@@ -74,17 +74,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function isAdmin(): bool
     {
-        return $this->roles->contains('Intranet Admin') && filled($this->vf_accesstoken);
-    }
-
-    public function vf(): Vereinsflieger
-    {
-        return new Vereinsflieger($this->vf_accesstoken);
-    }
-
-    public function getVfUser(): array
-    {
-        return $this->vf()->GetUser();
+        return $this->roles->contains('Intranet Admin');
     }
 
     public function department()
