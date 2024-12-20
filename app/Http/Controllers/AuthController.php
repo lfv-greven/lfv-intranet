@@ -12,6 +12,10 @@ class AuthController extends Controller
 {
     public function vfIframe(Request $request)
     {
+        if (!$request->has('accesstoken')) {
+            abort(400, 'Missing access token');
+        }
+
         $token = $request->get('accesstoken');
         $vf = app()->make(Vereinsflieger::class);
         $vfUser = $vf->IframeLogin($token);
@@ -26,11 +30,7 @@ class AuthController extends Controller
             );
         }
 
-        $vfUrl = 'https://vereinsflieger.de';
-        return response()
-            ->view('auth.vf-iframe', compact('loginUrl'))
-            ->header('X-Frame-Options', "ALLOW-FROM $vfUrl")
-            ->header('Content-Security-Policy', "frame-ancestors 'self' $vfUrl");
+        return view('auth.vf-iframe', compact('loginUrl'));
     }
 
     public function vfLogin(Request $request)
