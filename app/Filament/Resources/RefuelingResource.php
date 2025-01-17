@@ -127,7 +127,7 @@ class RefuelingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('counter_reading', 'desc')
+            ->defaultSort(fn($query) => $query->orderBy('counter_reading', 'desc')->orderBy('date', 'desc'))
             ->modifyQueryUsing(function ($query) {
                 return $query
                     ->select()
