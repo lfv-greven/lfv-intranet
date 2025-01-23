@@ -10,6 +10,14 @@
         @endauth
     </div>
 
+    @if($event)
+        <a href="{{ route('event', ['event' => $event->id]) }}"
+           class="block p-8 bg-green-200 rounded mb-12 text-center hover:ring ring-green-300">
+            <span class="text-gray-700 text-sm">Anmeldung zu</span> <br>
+            <strong class="text-lg">{{ $event->title }}</strong>
+        </a>
+    @endif
+
     <div class="grid md:grid-cols-2 gap-2">
         <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')">
             Tanken erfassen
@@ -20,9 +28,9 @@
         </x-home.menu-link>
 
         @admin
-            <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')">
-                Auslagenerstattung
-            </x-home.menu-link>
+        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')">
+            Auslagenerstattung
+        </x-home.menu-link>
         @endadmin
 
         <x-home.menu-link :href="route('department')" :icon_url="Vite::asset('resources/images/icons/teamwork.png')">
