@@ -17,6 +17,7 @@ class EventPage extends Component
         // Recheck free seats
         $slot = EventSlot::find($id);
         abort_unless($slot->free_seats > 0, 403);
+        abort_if($slot->start_time->isPast() > 0, 403);
 
         // Seats available
         EventEnrollment::updateOrCreate(
