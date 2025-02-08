@@ -11,8 +11,14 @@ use Livewire\Component;
 class EventPage extends Component
 {
     public Event $event;
+    public ?string $enrolledTo;
 
-    public function enroll($id)
+    public function mount()
+    {
+        $this->enrolledTo = $this->event->enrollment?->event_slot_id;
+    }
+
+    public function updatedEnrolledTo($id)
     {
         // Recheck free seats
         $slot = EventSlot::find($id);
@@ -25,11 +31,30 @@ class EventPage extends Component
             ['event_slot_id' => $slot->id],
         );
 
+        $this->enrolledTo = $slot->id;
+
         Notification::make()
             ->success()
             ->title('Erfolg')
             ->body('Deine Anmeldung wurde gespeichert.')
             ->send();
+    }
+
+    public function deleteEnrollment()
+    {
+        $enrollment = $this->event->enrollment;
+
+        abort_if($enrollment->slot->start_time->isPast(), 403);
+
+        $enrollment->delete();
+
+        Notification::make()
+            ->warning()
+            ->title('Erfolg')
+            ->body('Deine Anmeldung wurde gelöscht.')
+            ->send();
+
+        $this->enrolledTo = null;
     }
 
     public function render()
