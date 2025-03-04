@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Enums\ExpenseStatus;
 use App\Filament\Resources\ExpenseResource\Pages;
+use App\Jobs\EnrichExpenseWithIban;
 use App\Models\Expense;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -63,6 +65,22 @@ class ExpenseResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('reload_iban')
+                    ->label('IBAN')
+                    ->tooltip('IBAN neu aus dem Vereinsflieger auslesen')
+                    ->color('gray')
+                    ->button()
+                    ->icon('heroicon-o-arrow-path')
+                    ->hidden(fn($record) => $record->status != ExpenseStatus::OPEN)
+                    ->action(function ($record) {
+                        EnrichExpenseWithIban::dispatch($record);
+
+                        Notification::make()
+                            ->title('Einen Augenblick...')
+                            ->body('Die IBAN wird in den nächsten Sekunden automatisch aktualisiert.')
+                            ->success()
+                            ->send();
+                    }),
                 Tables\Actions\Action::make('show_receipt')
                     ->label('Beleg herunterladen')
                     ->color('gray')
