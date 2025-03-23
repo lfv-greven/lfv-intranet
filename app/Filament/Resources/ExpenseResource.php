@@ -6,6 +6,11 @@ use App\Enums\ExpenseStatus;
 use App\Filament\Resources\ExpenseResource\Pages;
 use App\Jobs\EnrichExpenseWithIban;
 use App\Models\Expense;
+use App\Models\User;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -27,15 +32,25 @@ class ExpenseResource extends Resource
 
     protected static ?string $pluralLabel = 'Auslagen';
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
+                TextInput::make('reason')
+                    ->required()
+                    ->label('Wofür war der Einkauf?'),
+                Select::make('user_id')
+                    ->label('Mitglied')
+                    ->relationship('user', modifyQueryUsing: fn($query) => $query->orderBy('lastname')->orderBy('firstname'))
+                    ->getOptionLabelFromRecordUsing(fn($record) => sprintf('%s %s', $record->firstname, $record->lastname)),
+                FileUpload::make('receipt_filename')
+                    ->required()
+                    ->directory('expenses')
+                    ->label('Belege')
+                    ->moveFiles()
+                    ->disk(config('filesystems.default'))
+                    ->previewable(false),
             ]);
     }
 
@@ -66,10 +81,9 @@ class ExpenseResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('reload_iban')
-                    ->label('IBAN')
                     ->tooltip('IBAN neu aus dem Vereinsflieger auslesen')
                     ->color('gray')
-                    ->button()
+                    ->iconButton()
                     ->icon('heroicon-o-arrow-path')
                     ->hidden(fn($record) => $record->status != ExpenseStatus::OPEN)
                     ->action(function ($record) {
@@ -82,10 +96,9 @@ class ExpenseResource extends Resource
                             ->send();
                     }),
                 Tables\Actions\Action::make('show_receipt')
-                    ->label('Beleg herunterladen')
                     ->color('gray')
                     ->openUrlInNewTab()
-                    ->button()
+                    ->iconButton()
                     ->icon('heroicon-s-eye')
                     ->action(function ($record) {
                         return Storage::download($record->receipt_filename, basename($record->receipt_filename));
