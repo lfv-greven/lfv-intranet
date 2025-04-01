@@ -29,7 +29,9 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
             $vf = app()->make('vfadmin');
             $vf->GetUsers();
 
-            return $vf->GetResponse();
+            $list = $vf->GetResponse();
+
+            return array_filter($list, fn ($row) => is_array($row));
         });
 
         // Find respective member
