@@ -9,6 +9,13 @@ class Event extends Model
 {
     use HasUlids;
 
+    public function scopeUpcoming($q)
+    {
+        $q->whereHas('slots', function ($q) {
+            $q->where('start_time', '>', now());
+        });
+    }
+
     public function slots()
     {
         return $this->hasMany(EventSlot::class);
