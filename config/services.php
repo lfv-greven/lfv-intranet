@@ -21,8 +21,9 @@ return [
         'password' => env('VF_PASSWORD'),
     ],
 
-    'tasks' => [
-        'url' => 'https://d1phq4qhqf.execute-api.eu-central-1.amazonaws.com/',
+    'mattermost' => [
+        'url' => env('MATTERMOST_URL'),
+        'token' => env('MATTERMOST_TOKEN'),
     ],
 
     'postmark' => [
