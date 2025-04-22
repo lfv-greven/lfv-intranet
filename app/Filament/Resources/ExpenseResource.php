@@ -6,11 +6,9 @@ use App\Enums\ExpenseStatus;
 use App\Filament\Resources\ExpenseResource\Pages;
 use App\Jobs\EnrichExpenseWithIban;
 use App\Models\Expense;
-use App\Models\User;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -42,8 +40,10 @@ class ExpenseResource extends Resource
                     ->label('Wofür war der Einkauf?'),
                 Select::make('user_id')
                     ->label('Mitglied')
-                    ->relationship('user', modifyQueryUsing: fn($query) => $query->orderBy('lastname')->orderBy('firstname'))
-                    ->getOptionLabelFromRecordUsing(fn($record) => sprintf('%s %s', $record->firstname, $record->lastname)),
+                    ->searchable()
+                    ->preload()
+                    ->relationship('user', modifyQueryUsing: fn ($query) => $query->orderBy('lastname')->orderBy('firstname'))
+                    ->getOptionLabelFromRecordUsing(fn ($record) => sprintf('%s %s', $record->firstname, $record->lastname)),
                 FileUpload::make('receipt_filename')
                     ->required()
                     ->directory('expenses')
@@ -85,7 +85,7 @@ class ExpenseResource extends Resource
                     ->color('gray')
                     ->iconButton()
                     ->icon('heroicon-o-arrow-path')
-                    ->hidden(fn($record) => $record->status != ExpenseStatus::OPEN)
+                    ->hidden(fn ($record) => $record->status != ExpenseStatus::OPEN)
                     ->action(function ($record) {
                         EnrichExpenseWithIban::dispatch($record);
 

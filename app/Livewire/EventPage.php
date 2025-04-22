@@ -11,6 +11,7 @@ use Livewire\Component;
 class EventPage extends Component
 {
     public Event $event;
+
     public ?string $enrolledTo;
 
     public function mount()

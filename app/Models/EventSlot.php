@@ -30,7 +30,7 @@ class EventSlot extends Model
     public function freeSeats(): Attribute
     {
         return new Attribute(
-            get: fn() => max(0, $this->max_participants - $this->enrollments()->count()),
+            get: fn () => max(0, $this->max_participants - $this->enrollments()->count()),
         );
     }
 }

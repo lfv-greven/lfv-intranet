@@ -5,11 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DepartmentResource\Pages;
 use App\Models\Department;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -48,7 +45,7 @@ class DepartmentResource extends Resource
                     ->label('Beschreibung'),
                 Placeholder::make('users')
                     ->label('Teilnehmer')
-                    ->content(fn($record) => new HtmlString($record->users->map(fn($row) => sprintf("%s \n (%s)", $row->name, $row->email))->join('<br>'))),
+                    ->content(fn ($record) => new HtmlString($record->users->map(fn ($row) => sprintf("%s \n (%s)", $row->name, $row->email))->join('<br>'))),
             ]);
     }
 
@@ -61,7 +58,7 @@ class DepartmentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('members')
                     ->label('Teilnhemer')
-                    ->getStateUsing(fn(Department $record) => $record->max_members == null
+                    ->getStateUsing(fn (Department $record) => $record->max_members == null
                         ? $record->users()->count()
                         : sprintf(
                             '%s/%s',

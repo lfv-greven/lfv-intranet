@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function vfIframe(Request $request)
     {
-        if (!$request->has('accesstoken')) {
+        if (! $request->has('accesstoken')) {
             abort(400, 'Missing access token');
         }
 
