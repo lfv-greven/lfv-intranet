@@ -25,14 +25,14 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        $memberList = cache()->remember('vf:users', 60 * 60 * 24, function () {
-            $vf = app()->make('vfadmin');
-            $vf->GetUsers();
+        // $memberList = cache()->remember('vf:users', 60 * 60 * 24, function () {
+        $vf = app()->make('vfadmin');
+        $vf->GetUsers();
 
-            $list = $vf->GetResponse();
+        $list = $vf->GetResponse();
 
-            return array_filter($list, fn ($row) => is_array($row));
-        });
+        $memberList = array_filter($list, fn ($row) => is_array($row));
+        // });
 
         // Find respective member
         $member = Arr::first($memberList, fn ($m) => $m['memberid'] == $this->expense->user->memberid);
