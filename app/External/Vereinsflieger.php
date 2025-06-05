@@ -2,6 +2,8 @@
 
 namespace App\External;
 
+use Illuminate\Support\Facades\App;
+
 class Vereinsflieger
 {
     private $InterfaceUrl = 'https://www.vereinsflieger.de/interface/rest/';
@@ -591,7 +593,13 @@ class Vereinsflieger
         curl_setopt($CurlHandle, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($CurlHandle, CURLOPT_SSL_VERIFYPEER, false);
         $Html = curl_exec($CurlHandle);
+
         $this->HttpStatusCode = curl_getinfo($CurlHandle, CURLINFO_HTTP_CODE);
+        if ($this->HttpStatusCode == 401) {
+            // Token expired, force recreate and relogin
+            App::forgetInstance('vfadmin');
+        }
+
         $ContentType = curl_getinfo($CurlHandle, CURLINFO_CONTENT_TYPE);
         switch ($ContentType) {
             case 'application/zip':
