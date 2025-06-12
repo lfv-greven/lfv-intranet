@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auslagenerstattung - LfV Greven</title>
-    @vite('resources/css/pdf/expense-report.css')
+    
+    <style>
+        {!! Vite::content('resources/css/pdf/expense-report.css') !!}
+    </style>
 </head>
 <body>
 <div class="container">
@@ -48,6 +51,16 @@
             </p>
         </div>
     </div>
+
+    @if(Str::contains($mime = Storage::mimeType($expense->receipt_filename), 'image'))
+        @php
+            $base64Image = base64_encode(Storage::read($expense->receipt_filename));
+        @endphp
+
+        <div class="break-before-page flex justify-center items-center">
+            <img src="data:{{ $mime }};base64,{{ $base64Image }}" class="receipt-image">
+        </div>
+    @endif
 </div>
 </body>
 </html>

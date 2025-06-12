@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@page {
+    size: A4;
+}
+
 .header {
     @apply text-center font-bold text-4xl;
 }
@@ -32,4 +36,8 @@ th {
 
 .meta {
     @apply mt-20 text-xs;
+}
+
+.receipt-image {
+    @apply max-w-[190mm] max-h-[277mm] w-auto h-auto block my-0 mx-auto break-inside-avoid;
 }

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Auth\VereinsfliegerUserProvider;
+use App\External\Gotenberg;
 use App\External\Vereinsflieger;
 use App\Models\User;
 use Filament\Support\Facades\FilamentColor;
@@ -17,7 +18,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(Gotenberg::class, fn () => new Gotenberg(
+            config('services.gotenberg.url'),
+            config('services.gotenberg.username'),
+            config('services.gotenberg.password'),
+        ));
+
         $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger);
+
         $this->app->singleton('vfadmin', function () {
             $vf = new Vereinsflieger;
             $vf->SignIn(

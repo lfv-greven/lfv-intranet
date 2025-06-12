@@ -17,10 +17,7 @@
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
         "predis/predis": "^2.2",
-        "setasign/fpdi": "^2.6",
         "spatie/laravel-pdf": "^1.5",
-        "spatie/temporary-directory": "^2.2",
-        "tecnickcom/tcpdf": "^6.7",
         "wire-elements/modal": "^2.0"
     },
     "require-dev": {
