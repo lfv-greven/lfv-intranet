@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Teams</title>
-    @vite('resources/css/pdf/department-descriptions.css')
+    
+    <style>
+        {!! Vite::content('resources/css/pdf/department-descriptions.css') !!}
+    </style>
 </head>
 <body>
 <div>
@@ -21,12 +24,9 @@
 
     <div class="grid grid-cols-1 divide-y divide-slate-300">
         @foreach($departments as $department)
-            <div class="p-4">
+            <div class="py-4 prose mx-auto max-w-full text-sm">
                 <h2 class="underline font-bold">{{ $department->name }}</h2>
-
-                <div class="prose text-sm">
-                    {!! $department->description !!}
-                </div>
+                {!! $department->description !!}
             </div>
         @endforeach
     </div>

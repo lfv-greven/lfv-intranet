@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\External\Gotenberg;
 use App\Models\Department;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Illuminate\Support\Facades\Cache;
 
 class DepartmentController extends Controller
 {
     public function teamDescriptions()
     {
-        $departments = Department::orderBy('name')->lazy();
+        $pdf = Cache::remember('pdf:team-descriptions', 60 * 60, function () {
+            $departments = Department::orderBy('name')->lazy();
+            $gotenberg = app()->make(Gotenberg::class);
 
-        return Pdf::view('pdf.department-descriptions', compact('departments'))
-            ->margins(20, 20, 20, 20)
-            ->format('A4')
-            ->name('Teams.pdf');
+            return $gotenberg->htmlToPdf(view('pdf.department-descriptions', compact('departments')));
+        });
+
+        return response()->pdf($pdf, 'Teams.pdf');
     }
 }
