@@ -25,7 +25,9 @@ class Gotenberg
 
         $request->attach('index.html', $html, 'index.html');
 
-        $res = $request->post('forms/chromium/convert/html', []);
+        $res = $request->post('forms/chromium/convert/html', [
+            'preferCssPageSize' => true,
+        ]);
 
         return $res->body();
     }
