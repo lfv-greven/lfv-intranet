@@ -14,6 +14,8 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
+    public $timeout = 60 * 2;
+
     /**
      * Create a new job instance.
      */
