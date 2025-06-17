@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\ExpenseStatus;
 use App\Events\ExpenseCreated;
 use App\Events\ExpenseUpdated;
+use App\Jobs\CompressExpenseImage;
 use App\Jobs\EnrichExpenseWithIban;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -36,6 +37,7 @@ class Expense extends Model
 
         static::created(function (Expense $expense) {
             EnrichExpenseWithIban::dispatch($expense);
+            CompressExpenseImage::dispatch($expense);
         });
 
         static::deleted(function (Expense $expense) {

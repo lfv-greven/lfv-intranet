@@ -11,11 +11,13 @@ class Gotenberg
         private $url,
         private $username,
         private $password,
-    ) {}
+    ) {
+    }
 
     private function request(): PendingRequest
     {
         return Http::baseUrl($this->url)
+            ->timeout(60)
             ->withBasicAuth($this->username, $this->password);
     }
 

@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Storage;
 
@@ -59,6 +60,9 @@ class ExpenseResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                TextColumn::make('id')
+                    ->copyable()
+                    ->hidden(app()->isProduction()),
                 Tables\Columns\TextColumn::make('created_at')
                     ->sortable()
                     ->label('Erstellt')

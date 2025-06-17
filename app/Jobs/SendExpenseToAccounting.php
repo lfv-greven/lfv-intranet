@@ -14,12 +14,12 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
-    public $timeout = 60 * 2;
-
     /**
      * Create a new job instance.
      */
-    public function __construct(public Expense $expense) {}
+    public function __construct(public Expense $expense)
+    {
+    }
 
     /**
      * Execute the job.
