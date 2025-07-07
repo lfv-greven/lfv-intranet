@@ -87,7 +87,7 @@ class CheckMotortimes extends Command
             // Check previous motorend = current motorstart
             if ($previousEnd !== $currentStart) {
                 $messages[] = sprintf(
-                    '• Dein Motor-Start stimmt nicht mit dem Motor-Ende des vorherigen Fluges überein. Die Betriebsstunden wurden daher nicht lückenlos erfasst! SOLL-Start: %s | IST-Start: %s',
+                    '• Dein Motor-Start muss vom Vorgänger übernommen werden, weicht aber ab. Die Betriebsstunden wurden daher nicht lückenlos erfasst! Solltest du deine Motorzeit korrekt eingetragen haben, sprich dich bitte mit deinem Vorflieger ab und korrigiert den Eintrag gemeinsam. SOLL-Start: %s | IST-Start: %s',
                     $this->formatTime($previousEnd),
                     $this->formatTime($currentStart),
                 );
