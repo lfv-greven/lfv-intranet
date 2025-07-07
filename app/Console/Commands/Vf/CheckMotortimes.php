@@ -70,41 +70,70 @@ class CheckMotortimes extends Command
 
     private function checkTimes(Collection $flights)
     {
-        $gaps = [];
+        $issues = [];
 
         for ($i = 1; $i < $flights->count(); $i++) {
             $previousEnd = $flights[$i - 1]['motorend'];
             $currentStart = $flights[$i]['motorstart'];
+            $currentEnd = $flights[$i]['motorend'];
+            $flighttime = $flights[$i]['flighttime'];
 
+            $messages = [];
+
+            // Check previous motorend = current motorstart
             if ($previousEnd !== $currentStart) {
-                $gaps[] = [
-                    'gap_after_flight' => $i - 1,
-                    'expected_start' => $this->formatTime($previousEnd),
-                    'actual_start' => $this->formatTime($currentStart),
+                $messages[] = sprintf(
+                    'Motor-Start entspricht nicht Motor-Ende des vorherigen Fluges. Flug nicht lückenlos erfasst! SOLL-Start: %s | IST-Start: %s',
+                    $this->formatTime($previousEnd),
+                    $this->formatTime($currentStart),
+                );
+            }
+
+            // Check that motor time > 0 mins
+            if ($currentStart >= $currentEnd) {
+                $messages[] = sprintf(
+                    'Motor-Start (%s) liegt nach Motor-Ende (%s)',
+                    $this->formatTime($currentStart),
+                    $this->formatTime($currentEnd),
+                );
+            }
+
+            // Check that motortime = flight time
+            $motortime = $currentEnd - $currentStart;
+            if ($this->timeToMins($motortime) != (int) $flighttime) {
+                $messages[] = sprintf(
+                    'Motorzeit (%s Minuten) ist nicht gleich Flugzeug (%s Minuten).',
+                    $this->timeToMins($motortime),
+                    (int) $flighttime
+                );
+            }
+
+            if (filled($messages)) {
+                $issues[] = [
+                    'message' => implode(PHP_EOL, $messages),
                     'flight' => $flights[$i],
                 ];
             }
         }
 
-        if (empty($gaps)) {
-            $this->info('Keine Lücken in den Motorzeiten gefunden.');
+        if (empty($issues)) {
+            $this->info('Keine Fehler in den Motorzeiten gefunden.');
         } else {
-            $this->warn('Gefundene Lücken in den Motorzeiten:');
+            $this->warn('Gefundene Fehler in den Motorzeiten:');
 
             $table = [];
 
-            foreach ($gaps as $gap) {
+            foreach ($issues as $issue) {
                 $table[] = [
-                    data_get($gap, 'flight.flid'),
-                    Carbon::parse(data_get($gap, 'flight.dateofflight'))->format('d.m.Y'),
-                    data_get($gap, 'flight.pilotname'),
-                    data_get($gap, 'flight.attendantname'),
-                    $gap['expected_start'],
-                    $gap['actual_start'],
+                    data_get($issue, 'flight.flid'),
+                    Carbon::parse(data_get($issue, 'flight.dateofflight'))->format('d.m.Y'),
+                    data_get($issue, 'flight.pilotname'),
+                    data_get($issue, 'flight.attendantname'),
+                    $issue['message'],
                 ];
             }
             $this->table(
-                ['Flug-ID', 'Datum', 'Pilot', 'Begleiter', 'SOLL-Start', 'IST-Start'],
+                ['Flug-ID', 'Datum', 'Pilot', 'Begleiter', 'Fehler'],
                 $table,
             );
         }
@@ -119,6 +148,18 @@ class CheckMotortimes extends Command
             return sprintf('%02d:%02d', $hours, $minutes);
         } catch (\Exception $e) {
             return $decimalTime;
+        }
+    }
+
+    private function timeToMins(string $decimalTime): int
+    {
+        try {
+            [$hours, $minutesFraction] = explode('.', $decimalTime);
+            $minutes = round(floatval("0.$minutesFraction") * 60);
+
+            return (int) $hours * 60 + $minutes;
+        } catch (\Exception $e) {
+            return 0;
         }
     }
 }
