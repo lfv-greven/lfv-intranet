@@ -3,9 +3,9 @@
 namespace App\Console\Commands\Vf;
 
 use App\External\Vereinsflieger;
+use App\Models\MotortimeReminder;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -26,26 +26,24 @@ class CheckMotortimes extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Checks for validation criteria regarding the motor times.';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $allFlights = cache()->remember('flights', now()->addDay(), function () {
-            /**
-             * @var Vereinsflieger
-             */
-            $vf = app()->make('vfadmin');
+        /**
+         * @var Vereinsflieger
+         */
+        $vf = app()->make('vfadmin');
 
-            $vf->GetFlights_Daterange(
-                now()->subWeek()->format('Y-m-d'),
-                now()->format('Y-m-d'),
-            );
+        $vf->GetFlights_Daterange(
+            now()->subWeek()->format('Y-m-d'),
+            now()->format('Y-m-d'),
+        );
 
-            return $vf->GetResponse();
-        });
+        $allFlights = $vf->GetResponse();
 
         $allowedCallsigns = [
             'D-EDDG',
@@ -78,10 +76,11 @@ class CheckMotortimes extends Command
         $issues = [];
 
         for ($i = 1; $i < $flights->count(); $i++) {
+            $flight = $flights[$i];
             $previousEnd = $flights[$i - 1]['motorend'];
-            $currentStart = $flights[$i]['motorstart'];
-            $currentEnd = $flights[$i]['motorend'];
-            $flighttime = $flights[$i]['flighttime'];
+            $currentStart = $flight['motorstart'];
+            $currentEnd = $flight['motorend'];
+            $flighttime = $flight['flighttime'];
 
             $messages = [];
 
@@ -113,10 +112,20 @@ class CheckMotortimes extends Command
                 );
             }
 
+            // Check departure rwy
+            if ($flight['aiddeparture'] == 900 && blank($flight['runwaydeparture'])) {
+                $messages[] = '• Start-Piste nicht eingetragen!';
+            }
+
+            // Check destination rwy
+            if ($flight['aidarrival'] == 900 && blank($flight['runwayarrival'])) {
+                $messages[] = '• Lande-Piste nicht eingetragen!';
+            }
+
             if (filled($messages)) {
                 $issues[] = [
                     'message' => implode(PHP_EOL, $messages),
-                    'flight' => $flights[$i],
+                    'flight' => $flight,
                 ];
             }
         }
@@ -150,13 +159,26 @@ class CheckMotortimes extends Command
                     continue;
                 }
 
-                // Send email reminders
+                // Check if reminder already sent
+                $flightId = data_get($issue, 'flight.flid');
+                if (MotortimeReminder::whereFlightId($flightId)->exists()) {
+                    $this->info('Reminder already sent');
+
+                    continue;
+                }
+
+                // Collect pilot emails
                 $mails = [$this->getMailForUserId($pilotId)];
                 if (filled($attendantId)) {
                     $mails[] = $this->getMailForUserId($attendantId);
                 }
 
-                $flightId = data_get($issue, 'flight.flid');
+                // No mail addresses exist
+                if (blank($mails)) {
+                    $this->error('No mails found');
+
+                    continue;
+                }
                 $callsign = data_get($issue, 'flight.callsign');
 
                 Mail::raw(<<<TEXT
@@ -176,12 +198,17 @@ Viele Grüße
 Dein LfV-Greven Motorflugteam.
 TEXT, function (Message $mail) use ($mails) {
                     $mail
-                        ->subject('[Dringend] Motorzeitenkontrolle - Dein Flug wurde falsch erfasst')
+                        ->subject('[Dringend] Dein Flug wurde falsch erfasst')
                         ->priority(Email::PRIORITY_HIGHEST)
                         ->to($mails)
                         ->cc('fabio.plogmann@sportflugzentrum.de')
                         ->cc('oliver.brunsmann@sportflugzentrum.de');
                 });
+
+                // Log sent mail
+                MotortimeReminder::create([
+                    'flight_id' => $flightId,
+                ]);
             }
             $this->table(
                 ['Flug-ID', 'Datum', 'Pilot', 'Begleiter', 'Fehler'],
@@ -239,6 +266,7 @@ TEXT, function (Message $mail) use ($mails) {
         }
 
         $user = Arr::first($memberList, fn ($row) => $row['uid'] == $userId);
+
         return $user['email'];
     }
 }
