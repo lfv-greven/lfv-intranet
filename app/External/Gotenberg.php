@@ -11,8 +11,7 @@ class Gotenberg
         private $url,
         private $username,
         private $password,
-    ) {
-    }
+    ) {}
 
     private function request(): PendingRequest
     {

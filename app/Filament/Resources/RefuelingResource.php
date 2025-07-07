@@ -17,6 +17,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -203,6 +204,23 @@ class RefuelingResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    BulkAction::make('send_vf_bulk')
+                        ->label('Verkäufe an VF senden')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                if ($record->isExported() || ! $record->gasStation->vf_articleid) {
+                                    continue;
+                                }
+
+                                SendRefueling::dispatch($record);
+                            }
+
+                            Notification::make()
+                                ->success()
+                                ->title('Verkäufe werden übertragen.')
+                                ->send();
+                        }),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])

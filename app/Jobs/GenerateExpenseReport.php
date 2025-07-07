@@ -12,9 +12,7 @@ class GenerateExpenseReport implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(public Expense $expense)
-    {
-    }
+    public function __construct(public Expense $expense) {}
 
     /**
      * Execute the job.

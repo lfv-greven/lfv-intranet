@@ -17,9 +17,7 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Expense $expense)
-    {
-    }
+    public function __construct(public Expense $expense) {}
 
     /**
      * Execute the job.
