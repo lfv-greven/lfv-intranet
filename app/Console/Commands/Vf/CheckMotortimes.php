@@ -196,9 +196,9 @@ https://vereinsflieger.de/member/community/editflight.php?flid=$flightId
 
 Viele Grüße
 Dein LfV-Greven Motorflugteam.
-TEXT, function (Message $mail) use ($mails) {
+TEXT, function (Message $mail) use ($mails, $flightId) {
                     $mail
-                        ->subject('[Dringend] Dein Flug wurde falsch erfasst')
+                        ->subject("[Dringend] Dein Flug wurde falsch erfasst (#$flightId)")
                         ->priority(Email::PRIORITY_HIGHEST)
                         ->to($mails)
                         ->cc('fabio.plogmann@sportflugzentrum.de')
