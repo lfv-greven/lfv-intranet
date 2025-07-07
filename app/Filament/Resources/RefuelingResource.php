@@ -132,6 +132,8 @@ class RefuelingResource extends Resource
             ->modifyQueryUsing(function ($query) {
                 return $query
                     ->select()
+                    ->with('aircraft')
+                    ->with('gasStation')
                     ->addSelect(DB::raw('(SELECT SUM(amount) FROM refuelings r2 WHERE refuelings.gas_station_id = r2.gas_station_id AND refuelings.counter_reading >= r2.counter_reading) AS fill_level'))
                     ->addSelect(DB::raw('CASE WHEN type = "filling" THEN NULL ELSE LAG(counter_reading) OVER (partition by gas_station_id order by counter_reading asc) - counter_reading - amount END AS diff'));
             })
