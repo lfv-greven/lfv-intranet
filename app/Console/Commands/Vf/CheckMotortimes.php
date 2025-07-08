@@ -28,6 +28,8 @@ class CheckMotortimes extends Command
      */
     protected $description = 'Checks for validation criteria regarding the motor times.';
 
+    private const EDDG = 900;
+
     /**
      * Execute the console command.
      */
@@ -39,7 +41,7 @@ class CheckMotortimes extends Command
         $vf = app()->make('vfadmin');
 
         $vf->GetFlights_Daterange(
-            now()->subWeek()->format('Y-m-d'),
+            now()->subMonth()->format('Y-m-d'),
             now()->format('Y-m-d'),
         );
 
@@ -63,7 +65,7 @@ class CheckMotortimes extends Command
             ->values();
 
         foreach ($flights as $flights) {
-            $this->info('Checking '.$flights->first()['callsign']);
+            $this->info('== Checking '.$flights->first()['callsign'].' ==');
 
             $this->checkTimes($flights);
 
@@ -77,19 +79,22 @@ class CheckMotortimes extends Command
 
         for ($i = 1; $i < $flights->count(); $i++) {
             $flight = $flights[$i];
-            $previousEnd = $flights[$i - 1]['motorend'];
-            $currentStart = $flight['motorstart'];
-            $currentEnd = $flight['motorend'];
+            $currentStart = $this->timeToMins($flight['motorstart']);
+            $currentEnd = $this->timeToMins($flight['motorend']);
             $flighttime = $flight['flighttime'];
+
+            $formattedPreviousEnd = $this->formatTime($flights[$i - 1]['motorend']);
+            $formattedCurrentStart = $this->formatTime($flight['motorstart']);
+            $formattedCurrentEnd = $this->formatTime($flight['motorend']);
 
             $messages = [];
 
             // Check previous motorend = current motorstart
-            if ($previousEnd !== $currentStart) {
+            if ($formattedPreviousEnd != $formattedCurrentStart) {
                 $messages[] = sprintf(
                     '• Dein Motor-Start muss vom Vorgänger übernommen werden, weicht aber ab. Die Betriebsstunden wurden daher nicht lückenlos erfasst! Solltest du deine Motorzeit korrekt eingetragen haben, sprich dich bitte mit deinem Vorflieger ab und korrigiert den Eintrag gemeinsam. SOLL-Start: %s | IST-Start: %s',
-                    $this->formatTime($previousEnd),
-                    $this->formatTime($currentStart),
+                    $formattedPreviousEnd,
+                    $formattedCurrentStart,
                 );
             }
 
@@ -97,28 +102,28 @@ class CheckMotortimes extends Command
             if ($currentStart >= $currentEnd) {
                 $messages[] = sprintf(
                     '• Motor-Start (%s) liegt nach Motor-Ende (%s)',
-                    $this->formatTime($currentStart),
-                    $this->formatTime($currentEnd),
+                    $formattedCurrentStart,
+                    $formattedCurrentEnd,
                 );
             }
 
             // Check that motortime = flight time
             $motortime = $currentEnd - $currentStart;
-            if ($this->timeToMins($motortime) != (int) $flighttime) {
+            if ($motortime != (int) $flighttime) {
                 $messages[] = sprintf(
                     '• Motorzeit (%s Minuten) ist nicht gleich Flugzeit (%s Minuten).',
-                    $this->timeToMins($motortime),
+                    $motortime,
                     (int) $flighttime
                 );
             }
 
             // Check departure rwy
-            if ($flight['aiddeparture'] == 900 && blank($flight['runwaydeparture'])) {
+            if ($flight['aiddeparture'] == static::EDDG && blank($flight['runwaydeparture'])) {
                 $messages[] = '• Start-Piste nicht eingetragen!';
             }
 
             // Check destination rwy
-            if ($flight['aidarrival'] == 900 && blank($flight['runwayarrival'])) {
+            if ($flight['aidarrival'] == static::EDDG && blank($flight['runwayarrival'])) {
                 $messages[] = '• Lande-Piste nicht eingetragen!';
             }
 
@@ -141,8 +146,6 @@ class CheckMotortimes extends Command
             foreach ($issues as $issue) {
                 $pilotId = data_get($issue, 'flight.uidpilot');
                 $attendantId = data_get($issue, 'flight.uidattendant') === '0' ? null : data_get($issue, 'flight.uidattendant');
-
-                $this->info("Sending to Pilot {$pilotId} and {$attendantId}");
 
                 $table[] = [
                     data_get($issue, 'flight.flid'),
@@ -201,8 +204,9 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
                         ->subject("[Dringend] Dein Flug wurde falsch erfasst (#$flightId)")
                         ->priority(Email::PRIORITY_HIGHEST)
                         ->to($mails)
-                        ->cc('fabio.plogmann@sportflugzentrum.de')
-                        ->cc('oliver.brunsmann@sportflugzentrum.de');
+                        ->bcc('fabio.plogmann@sportflugzentrum.de')
+                        ->bcc('oliver.brunsmann@sportflugzentrum.de')
+                        ->replyTo('fabio.plogmann@sportflugzentrum.de');
                 });
 
                 // Log sent mail
