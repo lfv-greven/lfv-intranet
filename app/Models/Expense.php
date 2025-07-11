@@ -53,6 +53,11 @@ class Expense extends Model
         ];
     }
 
+    public function scopeOpen($q)
+    {
+        $q->where('status', ExpenseStatus::OPEN);
+    }
+
     public function prunable()
     {
         return static::where('status', ExpenseStatus::REJECTED);

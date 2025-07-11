@@ -31,6 +31,11 @@ class ExpenseResource extends Resource
 
     protected static ?string $pluralLabel = 'Auslagen';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return Expense::open()->count();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
