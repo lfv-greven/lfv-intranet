@@ -13,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Filament\Notifications\Notification;
 use Illuminate\Support\Number;
 use Livewire\Component;
 
@@ -52,12 +51,7 @@ class RefuelingPage extends Component implements HasForms
             'comment' => $data->comment,
         ]);
 
-        Notification::make()
-            ->success()
-            ->title('Betankung wurde eingetragen')
-            ->send();
-
-        return $this->redirectRoute('home', navigate: true);
+        return $this->redirectRoute('refueling.success', navigate: true);
     }
 
     public function form(Form $form): Form
