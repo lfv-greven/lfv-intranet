@@ -3,13 +3,22 @@
 namespace App\Filament\Widgets;
 
 use App\Models\GasStation;
+use App\Models\MotortimeReminder;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Flowframe\Trend\Trend;
 
-class FuelingStats extends BaseWidget
+class DashboardStats extends BaseWidget
 {
     protected function getStats(): array
     {
+        $motortimeReminders = Trend::model(MotortimeReminder::class)
+            ->between(now()->subMonth(), now())
+            ->perDay()
+            ->count()
+            ->pluck('aggregate')
+            ->toArray();
+
         return [
             ...GasStation::all()->map(fn (GasStation $gasStation) => Stat::make(
                 $gasStation->name,
@@ -17,6 +26,9 @@ class FuelingStats extends BaseWidget
             )
                 ->description('Letzte 7 Tage: '.abs($gasStation->refuelings()->refueling()->where('date', '>', today()->subDays(7))->sum('amount')).' l')
             ),
+            Stat::make('Fehler Flugerfassung', 12)
+                ->description('Letzte 24 Stunden.')
+                ->chart($motortimeReminders),
         ];
     }
 }

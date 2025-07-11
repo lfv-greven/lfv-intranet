@@ -12,6 +12,7 @@
         "filament/filament": "^3.2",
         "filament/forms": "^3.2",
         "filament/notifications": "^3.2",
+        "flowframe/laravel-trend": "^0.4.0",
         "larabug/larabug": "dev-master",
         "laravel/framework": "^11.0",
         "laravel/tinker": "^2.9",
