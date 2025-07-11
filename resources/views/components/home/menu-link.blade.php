@@ -6,7 +6,7 @@
 
 <a
     href="{{ $href }}"
-    class="flex bg-neutral-200 rounded items-center p-4 space-x-4"
+    class="flex bg-white border shadow hover:shadow-lg rounded items-center p-4 space-x-4 transition"
     target="{{ $external ? '_blank' : '_self' }}"
     @unless($external) wire:navigate=false @endif
 >
