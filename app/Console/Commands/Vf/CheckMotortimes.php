@@ -83,9 +83,14 @@ class CheckMotortimes extends Command
             $currentEnd = $this->timeToMins($flight['motorend']);
             $flighttime = $flight['flighttime'];
 
-            $formattedPreviousEnd = $this->formatTime($flights[$i - 1]['motorend']);
+            $previousEnd = $flights[$i - 1]['motorend'];
+            $formattedPreviousEnd = $this->formatTime($previousEnd);
             $formattedCurrentStart = $this->formatTime($flight['motorstart']);
             $formattedCurrentEnd = $this->formatTime($flight['motorend']);
+
+            if (floatval($previousEnd) == 0) {
+                continue;
+            }
 
             $messages = [];
 
