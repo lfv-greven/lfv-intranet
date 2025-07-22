@@ -18,6 +18,8 @@ class DashboardStats extends BaseWidget
             ->count()
             ->pluck('aggregate')
             ->toArray();
+        $motortimeRemindersLast24h = MotortimeReminder::where('created_at', '>=', now()->subHours(24))
+            ->count();
 
         return [
             ...GasStation::all()->map(fn (GasStation $gasStation) => Stat::make(
@@ -26,7 +28,7 @@ class DashboardStats extends BaseWidget
             )
                 ->description('Letzte 7 Tage: '.abs($gasStation->refuelings()->refueling()->where('date', '>', today()->subDays(7))->sum('amount')).' l')
             ),
-            Stat::make('Fehler Flugerfassung', 12)
+            Stat::make('Fehler Flugerfassung', $motortimeRemindersLast24h)
                 ->description('Letzte 24 Stunden.')
                 ->chart($motortimeReminders),
         ];
