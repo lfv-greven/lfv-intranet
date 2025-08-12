@@ -77,7 +77,9 @@ class RefuelingPage extends Component implements HasForms
                                     ->find($state)
                                     ->refuelings_sum_amount;
 
-                                return 'Aktueller Füllstand: '.Number::format($filling, locale: 'de').' L';
+                                if ($filling) {
+                                    return 'Aktueller Füllstand: '.Number::format($filling, locale: 'de').' L';
+                                }
                             })
                             ->options(GasStation::pluck('name', 'id')),
 
