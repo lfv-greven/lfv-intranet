@@ -66,10 +66,11 @@ class ExpensesPage extends Component implements HasForms
                             ->hint('Du kannst mehrere Belege gleichzeitig hochladen.'),
                         Toggle::make('is_paid')
                             ->accepted()
-                            ->label('Ich bestätige, dass der Betrag bereits vollständig bezahlt ist und bitte um Erstattung auf mein Konto.'),
+                            ->label('Der Betrag ist bereits vollständig bezahlt und ich bitte um Erstattung auf mein Konto.'),
                         Toggle::make('is_correct_address')
                             ->accepted()
-                            ->label('Ich bestätige, dass die Rechnungsadresse unserer Vereinsadresse entspricht.'),
+                            ->label('Hinweise zur Rechnungsadresse habe ich geprüft:')
+                            ->helperText('Ab einem Betrag von 250 € muss die vollständige Adresse des Vereins als Rechnungsadresse aufgedruckt sein.'),
                     ]),
             ]);
     }
