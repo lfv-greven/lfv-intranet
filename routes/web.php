@@ -13,11 +13,14 @@ Route::redirect('/', '/login');
 Route::get('/home', HomePage::class)->name('home');
 Route::get('/tanken', RefuelingPage::class)->name('refueling');
 Route::view('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
-Route::get('/auslagen', \App\Livewire\ExpensesPage::class)->name('expenses');
 Route::get('/oil', OilLogPage::class)->name('oil');
-Route::get('/chat', ChatSettingsPage::class)->name('chat')->middleware('auth');
-Route::get('/department', \App\Livewire\DepartmentPage::class)->name('department')->middleware('auth');
-Route::get('/event/{event}', \App\Livewire\EventPage::class)->name('event')->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/auslagen', \App\Livewire\ExpensesPage::class)->name('expenses');
+    Route::get('/chat', ChatSettingsPage::class)->name('chat');
+    Route::get('/department', \App\Livewire\DepartmentPage::class)->name('department');
+    Route::get('/event/{event}', \App\Livewire\EventPage::class)->name('event');
+});
 
 Route::get('/login', LoginPage::class)->name('login')->middleware('guest');
 
