@@ -176,14 +176,14 @@ class CheckMotortimes extends Command
                 }
 
                 // Collect pilot emails
-                $mails = [$this->getMailForUserId($pilotId)];
-                if (filled($attendantId)) {
-                    $mails[] = $this->getMailForUserId($attendantId);
-                }
+                $mails = array_values(array_unique(array_filter([
+                    $this->getMailForUserId((int) $pilotId),
+                    filled($attendantId) ? $this->getMailForUserId((int) $attendantId) : null,
+                ], fn ($email) => is_string($email) && $email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL))));
 
                 // No mail addresses exist
                 if (blank($mails)) {
-                    $this->error('No mails found');
+                    $this->error('No valid mails found');
 
                     continue;
                 }
@@ -274,8 +274,15 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
             }
         }
 
-        $user = Arr::first($memberList, fn ($row) => $row['uid'] == $userId);
+        $user = Arr::first($memberList, fn ($row) => data_get($row, 'uid') == $userId);
+        $email = data_get($user, 'email');
 
-        return $user['email'];
+        if (! is_string($email)) {
+            return null;
+        }
+
+        $email = trim($email);
+
+        return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
     }
 }
