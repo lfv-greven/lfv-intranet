@@ -2,6 +2,8 @@
 
 return [
 
+    'datev_uploadmail' => 'ca610698-938f-4bd2-a55d-6996631ef284@uploadmail.datev.de',
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
