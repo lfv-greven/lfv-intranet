@@ -3,19 +3,22 @@
 namespace App\Livewire;
 
 use App\Models\Department;
-use Filament\Forms\Components\Fieldset;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Schema;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
-class DepartmentPage extends Component implements HasForms
+class DepartmentPage extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public $data = [];
@@ -40,11 +43,11 @@ class DepartmentPage extends Component implements HasForms
         //        }
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
-            ->schema([
+            ->components([
                 Fieldset::make('')
                     ->columns(1)
                     ->schema([

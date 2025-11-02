@@ -8,7 +8,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -51,11 +51,11 @@ class LoginPage extends Component implements HasActions, HasForms
             ]);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
-            ->schema([
+            ->components([
                 TextInput::make('email')
                     ->label('E-Mail-Adresse')
                     ->required()

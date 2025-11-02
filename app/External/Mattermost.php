@@ -2,11 +2,13 @@
 
 namespace App\External;
 
+use Http;
+
 class Mattermost
 {
     public static function requestPasswordReset(string $email): bool
     {
-        $res = \Http::asJson()
+        $res = Http::asJson()
             ->acceptJson()
             ->withToken(config('services.mattermost.token'))
             ->post(

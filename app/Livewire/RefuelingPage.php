@@ -6,18 +6,21 @@ use App\Enums\RefuelingType;
 use App\Models\Aircraft;
 use App\Models\GasStation;
 use App\Models\Refueling;
-use Filament\Forms\Components\Fieldset;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use Livewire\Component;
 
-class RefuelingPage extends Component implements HasForms
+class RefuelingPage extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public array $data = [];
@@ -54,12 +57,12 @@ class RefuelingPage extends Component implements HasForms
         return $this->redirectRoute('refueling.success', navigate: true);
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
             ->columns(2)
-            ->schema([
+            ->components([
                 Fieldset::make('Tankstelle wählen')
                     ->schema([
                         Select::make('gas_station_id')

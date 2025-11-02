@@ -3,18 +3,21 @@
 namespace App\Livewire;
 
 use App\Models\Expense;
-use Filament\Forms\Components\Fieldset;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
-class ExpensesPage extends Component implements HasForms
+class ExpensesPage extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
     use InteractsWithForms;
 
     public array $data = [
@@ -45,12 +48,12 @@ class ExpensesPage extends Component implements HasForms
         $this->saved = true;
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->statePath('data')
             ->model(Expense::class)
-            ->schema([
+            ->components([
                 Fieldset::make('Beleg')
                     ->columns(1)
                     ->schema([

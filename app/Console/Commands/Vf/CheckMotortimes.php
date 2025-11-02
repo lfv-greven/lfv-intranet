@@ -5,6 +5,7 @@ namespace App\Console\Commands\Vf;
 use App\External\Vereinsflieger;
 use App\Models\MotortimeReminder;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Mail\Message;
 use Illuminate\Support\Arr;
@@ -233,7 +234,7 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
             $minutes = round(floatval("0.$minutesFraction") * 60);
 
             return sprintf('%02d:%02d', $hours, $minutes);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e);
             report($e);
 
@@ -250,7 +251,7 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
             $minutes = round(floatval("0.$minutesFraction") * 60);
 
             return (int) $hours * 60 + $minutes;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error($e);
             report($e);
 
