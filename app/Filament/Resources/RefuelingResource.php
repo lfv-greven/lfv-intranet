@@ -210,11 +210,19 @@ class RefuelingResource extends Resource
                         ->label('Verkäufe an VF senden')
                         ->deselectRecordsAfterCompletion()
                         ->action(function ($records) {
+                            /** @var Refueling */
                             foreach ($records as $record) {
-                                if ($record->isExported() || ! $record->gasStation->vf_articleid) {
+                                // Already sold
+                                if ($record->isExported()) {
                                     continue;
                                 }
 
+                                // Not intended to be sold
+                                if (! $record->mayBeSold()) {
+                                    continue;
+                                }
+
+                                // Checks passed, send sale
                                 SendRefueling::dispatch($record);
                             }
 

@@ -82,8 +82,38 @@ class Refueling extends Model
         return filled($this->vf_exported_at);
     }
 
+    /**
+     * This methods checks if this sale is intended to be exported
+     * as a sale.
+     *
+     * Reasons for not salable is e.g. aircraft is owned.
+     */
+    public function mayBeSold(): bool
+    {
+        // No article linked
+        if (! $this->gasStation->vf_articleid) {
+            return false;
+        }
+
+        // Is own aircraft
+        if ($this->aircraft->owned) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function vfExport(): bool
     {
+        throw_unless($this->mayBeSold(), 'Refueling is not intended to be sold');
+
+        // In case this is already exported, just warn but not block the export.
+        if ($this->isExported()) {
+            Log::warning('Resending already exported sale', [
+                'refueling' => $this->id,
+            ]);
+        }
+
         $vf = app()->make('vfadmin');
 
         $comment = "Intranet-Vorgang: {$this->id}";
