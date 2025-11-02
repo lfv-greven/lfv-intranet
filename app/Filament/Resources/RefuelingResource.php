@@ -41,16 +41,6 @@ class RefuelingResource extends Resource
                 Select::make('gas_station_id')
                     ->required()
                     ->label('Tankstelle')
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set) {
-                        if (! $state) {
-                            return;
-                        }
-
-                        $gasStation = GasStation::findOrFail($state);
-
-                        $set('counter_reading', $gasStation->getCurrentCounterReading());
-                    })
                     ->options(GasStation::pluck('name', 'id')),
 
                 DateTimePicker::make('date')
@@ -95,7 +85,7 @@ class RefuelingResource extends Resource
                     ->required()
                     ->minValue(0)
                     ->numeric()
-                    ->live()
+                    ->live(onBlur: true)
                     ->afterStateUpdated(function ($state, $set, $get, $operation) {
                         if ($operation != 'create') {
                             return;
