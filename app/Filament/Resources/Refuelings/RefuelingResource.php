@@ -2,29 +2,15 @@
 
 namespace App\Filament\Resources\Refuelings;
 
-use App\Enums\RefuelingType;
-use App\Filament\Resources\Refuelings\Pages\ManageRefuelings;
-use App\Jobs\Vf\SendRefueling;
-use App\Models\Aircraft;
-use App\Models\GasStation;
+use App\Filament\Resources\Refuelings\Pages\CreateRefueling;
+use App\Filament\Resources\Refuelings\Pages\EditRefueling;
+use App\Filament\Resources\Refuelings\Pages\ListRefuelings;
+use App\Filament\Resources\Refuelings\Schemas\RefuelingForm;
+use App\Filament\Resources\Refuelings\Tables\RefuelingsTable;
 use App\Models\Refueling;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\DB;
 
 class RefuelingResource extends Resource
 {
@@ -42,219 +28,27 @@ class RefuelingResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema
-            ->columns(2)
-            ->components([
-                Select::make('gas_station_id')
-                    ->required()
-                    ->label('Tankstelle')
-                    ->options(GasStation::pluck('name', 'id')),
-
-                DateTimePicker::make('date')
-                    ->seconds(false)
-                    ->required()
-                    ->default(now()),
-
-                Select::make('aircraft_id')
-                    ->label('Flugzeug')
-                    ->disabled(fn ($get) => $get('type') == RefuelingType::filling->value)
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set) {
-                        $aircraft = Aircraft::find($state);
-
-                        $set('buyer_registration', $aircraft->registration);
-                    })
-                    ->options(Aircraft::pluck('registration', 'id')),
-
-                TextInput::make('buyer_registration')
-                    ->disabled(fn ($get) => $get('type') == RefuelingType::filling->value)
-                    ->requiredIf('type', 'refueling'),
-
-                Select::make('type')
-                    ->selectablePlaceholder(false)
-                    ->live()
-                    ->afterStateUpdated(function ($state, $set) {
-                        if ($state == RefuelingType::filling->value) {
-                            $set('aircraft_id', null);
-                            $set('buyer_registration', null);
-                        }
-                    })
-                    ->required()
-                    ->default(RefuelingType::refueling->value)
-                    ->options(RefuelingType::class),
-
-                TextInput::make('buyer_name')
-                    ->label('Pilot')
-                    ->required()
-                    ->default(auth()->user()->name),
-
-                TextInput::make('counter_reading')
-                    ->required()
-                    ->minValue(0)
-                    ->numeric()
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function ($state, $set, $get, $operation) {
-                        if ($operation != 'create') {
-                            return;
-                        }
-
-                        $gasStationId = $get('gas_station_id');
-                        if (! $gasStationId) {
-                            return;
-                        }
-
-                        $gasStation = GasStation::findOrFail($gasStationId);
-
-                        $set('amount', $state - $gasStation->getCurrentCounterReading());
-                    })
-                    ->suffix(' l'),
-
-                TextInput::make('amount')
-                    ->label('Menge')
-                    ->formatStateUsing(fn ($state) => abs($state))
-                    ->required()
-                    ->minValue(0)
-                    ->numeric()
-                    ->suffix(' l'),
-
-                Textarea::make('comment')
-                    ->columnSpanFull(),
-            ]);
+        return RefuelingForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->defaultSort(fn ($query) => $query
-                ->orderByDesc('counter_reading')
-                ->orderByDesc('date')
-                ->orderByDesc('id')
-            )
-            ->modifyQueryUsing(function ($query) {
-                return Refueling::query()
-                    ->with(['aircraft', 'gasStation'])
-                    ->select('refuelings.*')
-                    ->addSelect(DB::raw('
-        SUM(amount) OVER (
-          PARTITION BY gas_station_id
-          ORDER BY counter_reading, id
-          ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS fill_level
-    '))
-                    ->addSelect(DB::raw("
-        CASE
-          WHEN type = 'filling' THEN NULL
-          ELSE LAG(counter_reading) OVER (
-                 PARTITION BY gas_station_id
-                 ORDER BY counter_reading, id
-               ) - counter_reading - amount
-        END AS diff
-    "));
-            })
-            ->columns([
-                TextColumn::make('date')
-                    ->label('Datum')
-                    ->date('d.m.Y H:i'),
-                TextColumn::make('buyer_registration')
-                    ->badge(fn ($record) => filled($record->aircraft_id))
-                    ->color('gray')
-                    ->label('Kennzeichen'),
-                TextColumn::make('buyer_name')
-                    ->label('Name'),
-                TextColumn::make('counter_reading')
-                    ->numeric(0, null, '.')
-                    ->alignRight()
-                    ->label('Zählerstand'),
-                TextColumn::make('diff')
-                    ->numeric(0, null, '.')
-                    ->color(fn ($state) => $state < 0 ? 'danger' : null)
-                    ->alignRight()
-                    ->label('Diff'),
-                TextColumn::make('fill_level')
-                    ->label('Füllstand')
-                    ->numeric(0, null, '.')
-                    ->suffix(' l')
-                    ->alignRight()
-                    ->toggleable(),
-                TextColumn::make('amount')
-                    ->label('Menge')
-                    ->alignRight()
-                    ->numeric()
-                    ->color(function (Refueling $record, $state) {
-                        if ($record->amount < 0) {
-                            return 'danger';
-                        }
-                    })
-                    ->suffix(' l'),
-            ])
-            ->filters([
-                SelectFilter::make('gas_station_id')
-                    ->options(GasStation::pluck('name', 'id'))
-                    ->label('Tankstelle'),
-            ])
-            ->recordActions([
-                Action::make('send_vf')
-                    ->icon('heroicon-s-banknotes')
-                    ->iconButton()
-                    ->tooltip('Verkauf an Vereinsflieger übertragen')
-                    ->visible(fn ($record) => $record->type == RefuelingType::refueling && ! $record->aircraft?->owned)
-                    ->disabled(function (Refueling $record) {
-                        if ($record->isExported()) {
-                            return true;
-                        } elseif (! $record->gasStation->vf_articleid) {
-                            return true;
-                        }
+        return RefuelingsTable::configure($table);
+    }
 
-                        return false;
-                    })
-                    ->action(function (Refueling $record) {
-                        SendRefueling::dispatch($record);
-
-                        Notification::make()
-                            ->success()
-                            ->title('Verkauf wird im Hintergrund übertragen.')
-                            ->send();
-                    }),
-                EditAction::make()->iconButton(),
-                DeleteAction::make()->iconButton(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    BulkAction::make('send_vf_bulk')
-                        ->label('Verkäufe an VF senden')
-                        ->deselectRecordsAfterCompletion()
-                        ->action(function ($records) {
-                            /** @var Refueling */
-                            foreach ($records as $record) {
-                                // Already sold
-                                if ($record->isExported()) {
-                                    continue;
-                                }
-
-                                // Not intended to be sold
-                                if (! $record->mayBeSold()) {
-                                    continue;
-                                }
-
-                                // Checks passed, send sale
-                                SendRefueling::dispatch($record);
-                            }
-
-                            Notification::make()
-                                ->success()
-                                ->title('Verkäufe werden übertragen.')
-                                ->send();
-                        }),
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->paginationPageOptions([50, 100, 250]);
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ManageRefuelings::route('/'),
+            'index' => ListRefuelings::route('/'),
+            'create' => CreateRefueling::route('/create'),
+            'edit' => EditRefueling::route('/{record}/edit'),
         ];
     }
 }
