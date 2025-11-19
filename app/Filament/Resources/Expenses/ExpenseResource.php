@@ -109,11 +109,14 @@ class ExpenseResource extends Resource
                     }),
                 Action::make('show_receipt')
                     ->color('gray')
-                    ->openUrlInNewTab()
                     ->iconButton()
                     ->icon('heroicon-s-eye')
-                    ->action(function ($record) {
-                        return Storage::download($record->receipt_filename, basename($record->receipt_filename));
+                    ->openUrlInNewTab()
+                    ->url(function ($record) {
+                        return Storage::temporaryUrl(
+                            $record->receipt_filename,
+                            now()->addMinute(),
+                        );
                     }),
             ])
             ->toolbarActions([
