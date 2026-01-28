@@ -1,5 +1,14 @@
-<x-layouts.app>
+<?php
 
+use Livewire\Component;
+
+new class extends Component
+{
+    //
+};
+?>
+
+<div>
     <div class="my-12 space-y-4 flex flex-col justify-center">
         <img src="{{ Vite::asset('resources/images/owl/check.png') }}" class="h-72 mx-auto" />
 
@@ -13,5 +22,4 @@
             zurück
         </a>
     </div>
-
-</x-layouts.app>
+</div>

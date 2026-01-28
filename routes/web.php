@@ -12,7 +12,7 @@ Route::redirect('/', '/login');
 
 Route::get('/home', HomePage::class)->name('home');
 Route::get('/tanken', RefuelingPage::class)->name('refueling');
-Route::view('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
+Route::livewire('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
 Route::get('/oil', OilLogPage::class)->name('oil');
 
 Route::middleware('auth')->group(function () {
