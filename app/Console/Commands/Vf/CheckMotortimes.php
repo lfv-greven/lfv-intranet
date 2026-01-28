@@ -211,7 +211,6 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
                         ->priority(Email::PRIORITY_HIGHEST)
                         ->to($mails)
                         ->bcc('fabio.plogmann@sportflugzentrum.de')
-                        ->bcc('oliver.brunsmann@sportflugzentrum.de')
                         ->replyTo('fabio.plogmann@sportflugzentrum.de');
                 });
 
