@@ -91,12 +91,12 @@ class Refueling extends Model
     public function mayBeSold(): bool
     {
         // No article linked
-        if (! $this->gasStation->vf_articleid) {
+        if (! $this->gasStation?->vf_articleid) {
             return false;
         }
 
         // Is own aircraft
-        if ($this->aircraft->owned) {
+        if ($this->aircraft?->owned) {
             return false;
         }
 
