@@ -4,11 +4,11 @@ namespace App\Console\Commands\Vf;
 
 use App\External\Vereinsflieger;
 use App\Models\MotortimeReminder;
+use App\Services\VereinsfliegerUsers;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Mail\Message;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mime\Email;
@@ -260,21 +260,7 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
 
     private function getMailForUserId(int $userId): ?string
     {
-        $memberList = cache()->get('vf:users');
-        if (! $memberList) {
-            $vf = app()->make('vfadmin');
-            $vf->GetUsers();
-
-            $list = $vf->GetResponse();
-
-            $memberList = array_filter($list, fn ($row) => is_array($row));
-
-            if (count($memberList) > 0) {
-                cache()->put('vf:users', $memberList, now()->endOfDay());
-            }
-        }
-
-        $user = Arr::first($memberList, fn ($row) => data_get($row, 'uid') == $userId);
+        $user = app(VereinsfliegerUsers::class)->findByUserId($userId);
         $email = data_get($user, 'email');
 
         if (! is_string($email)) {

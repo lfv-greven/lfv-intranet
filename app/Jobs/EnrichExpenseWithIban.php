@@ -3,10 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Expense;
+use App\Services\VereinsfliegerUsers;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Arr;
 
 class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
 {
@@ -25,22 +25,8 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
      */
     public function handle(): void
     {
-        $memberList = cache()->get('vf:users');
-        if (! $memberList) {
-            $vf = app()->make('vfadmin');
-            $vf->GetUsers();
-
-            $list = $vf->GetResponse();
-
-            $memberList = array_filter($list, fn ($row) => is_array($row));
-
-            if (count($memberList) > 0) {
-                cache()->put('vf:users', $memberList, now()->endOfDay());
-            }
-        }
-
         // Find respective member
-        $member = Arr::first($memberList, fn ($m) => $m['memberid'] == $this->expense->user->memberid);
+        $member = app(VereinsfliegerUsers::class)->findByMemberId($this->expense->user->memberid);
 
         if (! $member) {
             return;
