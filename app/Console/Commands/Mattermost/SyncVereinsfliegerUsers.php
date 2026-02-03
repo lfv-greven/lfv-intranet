@@ -160,8 +160,6 @@ class SyncVereinsfliegerUsers extends Command
             $next = (string) Arr::get($expected, $key, '');
 
             if ($current !== $next) {
-                $this->info("$current -> $next");
-
                 return true;
             }
         }
