@@ -24,6 +24,7 @@ return [
     'mattermost' => [
         'url' => env('MATTERMOST_URL'),
         'token' => env('MATTERMOST_TOKEN'),
+        'default_team_id' => env('MATTERMOST_DEFAULT_TEAM_ID'),
     ],
 
     'postmark' => [
