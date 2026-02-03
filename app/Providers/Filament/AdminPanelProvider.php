@@ -2,9 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -20,6 +22,17 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function boot()
+    {
+        Filament::registerNavigationItems([
+            NavigationItem::make('Docs')
+                ->url('/docs')
+                ->openUrlInNewTab()
+                ->icon('heroicon-o-lifebuoy')
+                ->label('Handbuch'),
+        ]);
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
@@ -52,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->unsavedChangesAlerts();
     }
 }
