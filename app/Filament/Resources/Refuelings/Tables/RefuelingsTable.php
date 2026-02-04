@@ -46,6 +46,7 @@ class RefuelingsTable
         END AS diff
     "));
             })
+            ->selectCurrentPageOnly()
             ->checkIfRecordIsSelectableUsing(fn (Refueling $record) => ! $record->isExported() && $record->mayBeSold())
             ->columns([
                 TextColumn::make('date')
