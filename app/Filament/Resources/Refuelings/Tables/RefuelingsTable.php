@@ -9,7 +9,6 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -47,6 +46,7 @@ class RefuelingsTable
         END AS diff
     "));
             })
+            ->checkIfRecordIsSelectableUsing(fn (Refueling $record) => ! $record->isExported() && $record->mayBeSold())
             ->columns([
                 TextColumn::make('date')
                     ->label('Datum')
@@ -136,7 +136,6 @@ class RefuelingsTable
                                 ->title('Verkäufe werden übertragen.')
                                 ->send();
                         }),
-                    DeleteBulkAction::make(),
                 ]),
             ])
             ->paginationPageOptions([50, 100, 250]);
