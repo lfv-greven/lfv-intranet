@@ -90,6 +90,11 @@ class Refueling extends Model
      */
     public function mayBeSold(): bool
     {
+        // Only refuelings, not fillings
+        if ($this->type != RefuelingType::refueling) {
+            return false;
+        }
+
         // No article linked
         if (! $this->gasStation?->vf_articleid) {
             return false;
