@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class FiSettlementResource extends Resource
 {
@@ -27,6 +28,20 @@ class FiSettlementResource extends Resource
     protected static ?string $label = 'FI-Abrechnung';
 
     protected static ?string $pluralLabel = 'FI-Abrechnungen';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withCount([
+                'flights',
+                'flights as flights_sent_count' => fn (Builder $query) => $query->whereNotNull('workhour_sent_at'),
+                'flights as flights_excluded_count' => fn (Builder $query) => $query->whereNotNull('excluded_reason'),
+                'flights as flights_rejected_count' => fn (Builder $query) => $query->where('excluded_reason', 'vf_rejected'),
+                'flights as flights_missing_fi_count' => fn (Builder $query) => $query->where('excluded_reason', 'missing_fi_uid'),
+                'flights as flights_invalid_time_count' => fn (Builder $query) => $query->where('excluded_reason', 'invalid_flighttime'),
+                'flights as flights_missing_category_count' => fn (Builder $query) => $query->where('excluded_reason', 'missing_workhour_category'),
+            ]);
+    }
 
     private static function monthOptions(): array
     {
@@ -99,7 +114,7 @@ class FiSettlementResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
-            ->poll()
+            ->poll('5s')
             ->columns([
                 TextColumn::make('id')
                     ->copyable()
@@ -112,6 +127,7 @@ class FiSettlementResource extends Resource
                     ->date('d.m.Y'),
                 TextColumn::make('status')
                     ->label('Status')
+                    ->badge()
                     ->formatStateUsing(function ($state) {
                         if ($state instanceof FiSettlementStatus) {
                             return $state->getLabel();
@@ -119,6 +135,33 @@ class FiSettlementResource extends Resource
 
                         return FiSettlementStatus::tryFrom((string) $state)?->getLabel() ?? $state;
                     }),
+                TextColumn::make('flights_count')
+                    ->label('Flüge')
+                    ->alignRight(),
+                TextColumn::make('flights_sent_count')
+                    ->label('Gebucht')
+                    ->alignRight(),
+                TextColumn::make('flights_excluded_count')
+                    ->label('Ausgeschlossen')
+                    ->alignRight()
+                    ->description(function (FiSettlement $record) {
+                        $parts = [];
+
+                        if ($record->flights_missing_fi_count > 0) {
+                            $parts[] = "fehlende FI-ID: {$record->flights_missing_fi_count}";
+                        }
+                        if ($record->flights_invalid_time_count > 0) {
+                            $parts[] = "ungültige Zeit: {$record->flights_invalid_time_count}";
+                        }
+                        if ($record->flights_missing_category_count > 0) {
+                            $parts[] = "Kategorie fehlt: {$record->flights_missing_category_count}";
+                        }
+
+                        return $parts === [] ? null : implode(' · ', $parts);
+                    }),
+                TextColumn::make('flights_rejected_count')
+                    ->label('VF Fehler')
+                    ->alignRight(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

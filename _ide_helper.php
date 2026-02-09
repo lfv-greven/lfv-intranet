@@ -28246,6 +28246,64 @@ namespace Illuminate\View {
             }
     }
 
+namespace Illuminate\Console\Scheduling {
+    /**
+     */
+    class Event {
+        /**
+         * @var MonitoredScheduledTasks $monitoredScheduledTasks
+         * @see \Spatie\ScheduleMonitor\ScheduleMonitorServiceProvider::registerSchedulerEventMacros()
+         * @param string $monitorName
+         * @static
+         */
+        public static function monitorName($monitorName)
+        {
+            return \Illuminate\Console\Scheduling\Event::monitorName($monitorName);
+        }
+
+        /**
+         * @see \Spatie\ScheduleMonitor\ScheduleMonitorServiceProvider::registerSchedulerEventMacros()
+         * @param int $graceTimeInMinutes
+         * @static
+         */
+        public static function graceTimeInMinutes($graceTimeInMinutes)
+        {
+            return \Illuminate\Console\Scheduling\Event::graceTimeInMinutes($graceTimeInMinutes);
+        }
+
+        /**
+         * @see \Spatie\ScheduleMonitor\ScheduleMonitorServiceProvider::registerSchedulerEventMacros()
+         * @param bool $bool
+         * @static
+         */
+        public static function doNotMonitor($bool = true)
+        {
+            return \Illuminate\Console\Scheduling\Event::doNotMonitor($bool);
+        }
+
+        /**
+         * @see \Spatie\ScheduleMonitor\ScheduleMonitorServiceProvider::registerSchedulerEventMacros()
+         * @param bool $bool
+         * @static
+         */
+        public static function doNotMonitorAtOhDear($bool = true)
+        {
+            return \Illuminate\Console\Scheduling\Event::doNotMonitorAtOhDear($bool);
+        }
+
+        /**
+         * @see \Spatie\ScheduleMonitor\ScheduleMonitorServiceProvider::registerSchedulerEventMacros()
+         * @param bool $bool
+         * @static
+         */
+        public static function storeOutputInDb($bool = true)
+        {
+            return \Illuminate\Console\Scheduling\Event::storeOutputInDb($bool);
+        }
+
+            }
+    }
+
 
 namespace  {
     class App extends \Illuminate\Support\Facades\App {}
