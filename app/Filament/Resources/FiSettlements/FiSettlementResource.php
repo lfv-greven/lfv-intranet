@@ -5,8 +5,6 @@ namespace App\Filament\Resources\FiSettlements;
 use App\Enums\FiSettlementStatus;
 use App\Filament\Resources\FiSettlements\Pages\ManageFiSettlements;
 use App\Models\FiSettlement;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
@@ -178,11 +176,6 @@ class FiSettlementResource extends Resource
                 TextColumn::make('flights_rejected_count')
                     ->label('VF Fehler')
                     ->alignRight(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 

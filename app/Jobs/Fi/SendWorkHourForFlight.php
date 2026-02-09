@@ -51,6 +51,12 @@ class SendWorkHourForFlight implements ShouldQueue
             return;
         }
 
+        if (FiSettlementFlight::where('vf_flight_id', $flight->vf_flight_id)
+            ->whereNotNull('workhour_sent_at')
+            ->exists()) {
+            return;
+        }
+
         $categoryId = (int) config('fi_workhours.category_id', 0);
         if ($categoryId <= 0) {
             $flight->forceFill(['excluded_reason' => 'missing_workhour_category'])->save();

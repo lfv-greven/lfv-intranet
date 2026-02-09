@@ -100,8 +100,14 @@ class FetchFlights implements ShouldQueue
             [$fiUid, $fiName] = $this->resolveFi($flight);
 
             $excludedReason = null;
+            if (FiSettlementFlight::where('vf_flight_id', $flightId)
+                ->whereNotNull('workhour_sent_at')
+                ->exists()) {
+                $excludedReason = 'already_sent';
+            }
+
             if (! $fiUid) {
-                $excludedReason = 'missing_fi_uid';
+                $excludedReason ??= 'missing_fi_uid';
             }
 
             $flightMinutes = (int) data_get($flight, 'flighttime');
