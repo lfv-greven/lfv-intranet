@@ -18,7 +18,7 @@ enum FiSettlementStatus: string implements HasColor, HasLabel
         return match ($this) {
             self::DRAFT => 'gray',
             self::QUEUED => 'gray',
-            self::PROCESSING => 'gray',
+            self::PROCESSING => 'info',
             self::COMPLETED => 'success',
             self::FAILED => 'danger',
         };
