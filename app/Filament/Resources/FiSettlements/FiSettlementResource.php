@@ -5,7 +5,6 @@ namespace App\Filament\Resources\FiSettlements;
 use App\Enums\FiSettlementStatus;
 use App\Filament\Resources\FiSettlements\Pages\ManageFiSettlements;
 use App\Models\FiSettlement;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -72,29 +71,14 @@ class FiSettlementResource extends Resource
                             ->searchable()
                             ->required()
                             ->default(now()->subMonthNoOverflow()->format('Y-m'))
-                            ->dehydrated(false)
-                            ->afterStateUpdated(function ($state, $set) {
-                                if (! $state) {
-                                    return;
-                                }
-
-                                $period = \Illuminate\Support\Carbon::createFromFormat('Y-m', $state)->startOfMonth();
-                                $set('period_from', $period->format('Y-m-d'));
-                                $set('period_to', $period->copy()->endOfMonth()->format('Y-m-d'));
-                            })
+                            ->dehydrated()
                             ->afterStateHydrated(function ($state, $record, $set) {
                                 if (! $record || ! $record->period_from) {
                                     return;
                                 }
 
                                 $set('period_month', $record->period_from->format('Y-m'));
-                                $set('period_from', $record->period_from->format('Y-m-d'));
-                                $set('period_to', $record->period_to?->format('Y-m-d'));
                             }),
-                        Hidden::make('period_from')
-                            ->required(),
-                        Hidden::make('period_to')
-                            ->required(),
                     ]),
                 Section::make('Berechnung')
                     ->description('Wähle aus, welche Flugarten berücksichtigt werden sollen.')

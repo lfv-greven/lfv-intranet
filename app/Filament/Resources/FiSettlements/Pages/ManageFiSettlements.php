@@ -17,6 +17,13 @@ class ManageFiSettlements extends ManageRecords
         return [
             CreateAction::make()
                 ->mutateFormDataUsing(function (array $data): array {
+                    $month = $data['period_month'] ?? now()->subMonthNoOverflow()->format('Y-m');
+                    unset($data['period_month']);
+
+                    $period = \Illuminate\Support\Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+                    $data['period_from'] = $period->format('Y-m-d');
+                    $data['period_to'] = $period->copy()->endOfMonth()->format('Y-m-d');
+
                     $data['status'] = FiSettlementStatus::QUEUED;
                     $data['created_by'] = auth()->id();
 
