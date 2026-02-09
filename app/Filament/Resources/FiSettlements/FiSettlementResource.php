@@ -121,7 +121,7 @@ class FiSettlementResource extends Resource
                                 15 => 'S-FI - FI-Ausbildung',
                             ])
                             ->required()
-                            ->default([8]),
+                            ->default([2, 8, 11, 12]),
                     ]),
             ]);
     }
