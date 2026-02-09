@@ -7,7 +7,6 @@ use App\Filament\Resources\FiSettlements\FiSettlementResource;
 use App\Jobs\Fi\BuildFiSettlement;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ManageRecords;
-use Illuminate\Support\Carbon;
 
 class ManageFiSettlements extends ManageRecords
 {
@@ -18,13 +17,6 @@ class ManageFiSettlements extends ManageRecords
         return [
             CreateAction::make()
                 ->mutateFormDataUsing(function (array $data): array {
-                    $month = $data['period_month'] ?? now()->subMonthNoOverflow()->format('Y-m');
-                    unset($data['period_month']);
-
-                    $period = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
-                    $data['period_from'] = $period->format('Y-m-d');
-                    $data['period_to'] = $period->copy()->endOfMonth()->format('Y-m-d');
-
                     $data['status'] = FiSettlementStatus::QUEUED;
                     $data['created_by'] = auth()->id();
 
