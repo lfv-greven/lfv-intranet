@@ -6,10 +6,12 @@ use App\Auth\VereinsfliegerUserProvider;
 use App\External\Gotenberg;
 use App\External\Vereinsflieger;
 use App\Models\User;
+use Carbon\Carbon;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -27,15 +29,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger);
 
-        $this->app->singleton('vfadmin', function () {
-            $vf = new Vereinsflieger;
-            $vf->SignIn(
-                config('services.vereinsflieger.username'),
-                config('services.vereinsflieger.password'),
-            );
-
-            return $vf;
-        });
     }
 
     /**
@@ -43,6 +36,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Carbon::setLocale(config('app.locale'));
+        Number::useLocale('de');
+
         Auth::provider('vereinsflieger', function ($app, $config) {
             return new VereinsfliegerUserProvider(app('hash'), User::class);
         });

@@ -4,6 +4,7 @@ namespace App\Console\Commands\Vf;
 
 use App\External\Vereinsflieger;
 use App\Models\MotortimeReminder;
+use App\Services\VereinsfliegerClient;
 use App\Services\VereinsfliegerUsers;
 use Carbon\Carbon;
 use Exception;
@@ -39,14 +40,15 @@ class CheckMotortimes extends Command
         /**
          * @var Vereinsflieger
          */
-        $vf = app()->make('vfadmin');
+        $client = app(VereinsfliegerClient::class);
+        [$success, $status, $response] = $client->callWithRetry(function ($vf) {
+            return $vf->GetFlights_Daterange(
+                now()->subMonth()->format('Y-m-d'),
+                now()->format('Y-m-d'),
+            );
+        });
 
-        $vf->GetFlights_Daterange(
-            now()->subMonth()->format('Y-m-d'),
-            now()->format('Y-m-d'),
-        );
-
-        $allFlights = $vf->GetResponse();
+        $allFlights = is_array($response) ? $response : [];
 
         $allowedCallsigns = [
             'D-EDDG',

@@ -119,22 +119,23 @@ class Refueling extends Model
             ]);
         }
 
-        $vf = app()->make('vfadmin');
-
         $comment = "Intranet-Vorgang: {$this->id}";
         if ($this->aircraft?->billing_memberid) {
             $comment .= " | Pilot: {$this->buyer_name}";
         }
 
-        $success = $vf->InsertSale([
-            'bookingdate' => $this->date->format('Y-m-d'),
-            'articleid' => $this->gasStation->vf_articleid,
-            'amount' => abs($this->amount),
-            'callsign' => $this->buyer_registration,
-            'memberid' => $this->aircraft?->billing_memberid ?? $this->user?->memberid,
-            'counter' => $this->counter_reading,
-            'comment' => $comment,
-        ]);
+        $client = app(VereinsfliegerClient::class);
+        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($comment) {
+            return $vf->InsertSale([
+                'bookingdate' => $this->date->format('Y-m-d'),
+                'articleid' => $this->gasStation->vf_articleid,
+                'amount' => abs($this->amount),
+                'callsign' => $this->buyer_registration,
+                'memberid' => $this->aircraft?->billing_memberid ?? $this->user?->memberid,
+                'counter' => $this->counter_reading,
+                'comment' => $comment,
+            ]);
+        });
 
         if ($success) {
             $this->vf_exported_at = now();
@@ -142,7 +143,7 @@ class Refueling extends Model
 
             Log::debug('Inserted VF sale', [
                 'refueling' => $this->id,
-                'response' => $vf->GetResponse(),
+                'response' => $response,
             ]);
 
             return true;

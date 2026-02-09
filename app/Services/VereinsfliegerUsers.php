@@ -42,6 +42,11 @@ class VereinsfliegerUsers
         return null;
     }
 
+    public function findBankDataByMemberId(?int $memberId): ?array
+    {
+        return $this->extractBankData($this->findByMemberId($memberId));
+    }
+
     public function findByUserId(?int $userId): ?array
     {
         if (! $userId) {
@@ -57,12 +62,23 @@ class VereinsfliegerUsers
         return null;
     }
 
+    public function findBankDataByUserId(?int $userId): ?array
+    {
+        return $this->extractBankData($this->findByUserId($userId));
+    }
+
     private function fetchUsers(): array
     {
-        $vf = app()->make('vfadmin');
-        $vf->GetUsers();
+        $client = app(VereinsfliegerClient::class);
+        [$success, $status, $response] = $client->callWithRetry(function ($vf) {
+            return $vf->GetUsers();
+        });
 
-        return $this->sanitizeUsers($vf->GetResponse());
+        if (! $success) {
+            return [];
+        }
+
+        return $this->sanitizeUsers($response);
     }
 
     private function sanitizeUsers(mixed $list): array
@@ -100,5 +116,24 @@ class VereinsfliegerUsers
         }
 
         return true;
+    }
+
+    private function extractBankData(?array $user): ?array
+    {
+        if (! $user) {
+            return null;
+        }
+
+        $iban = data_get($user, 'iban');
+        $bic = data_get($user, 'bic');
+
+        if (blank($iban) && blank($bic)) {
+            return null;
+        }
+
+        return [
+            'iban' => $iban,
+            'bic' => $bic,
+        ];
     }
 }

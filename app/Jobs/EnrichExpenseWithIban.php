@@ -26,14 +26,14 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         // Find respective member
-        $member = app(VereinsfliegerUsers::class)->findByMemberId($this->expense->user->memberid);
+        $bankData = app(VereinsfliegerUsers::class)->findBankDataByMemberId($this->expense->user->memberid);
 
-        if (! $member) {
+        if (! $bankData) {
             return;
         }
 
-        $this->expense->iban = data_get($member, 'iban');
-        $this->expense->bic = data_get($member, 'bic');
+        $this->expense->iban = data_get($bankData, 'iban');
+        $this->expense->bic = data_get($bankData, 'bic');
         $this->expense->saveQuietly();
     }
 
