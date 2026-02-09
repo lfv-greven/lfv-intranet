@@ -1,5 +1,6 @@
-@import 'tailwindcss';
-@import '../../vendor/filament/filament/resources/css/theme.css';
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import "tailwindcss";
+@import "../../vendor/filament/filament/resources/css/theme.css";
 
 @source '../../../../app/Filament';
 @source '../../../../resources/views/filament';
@@ -10,15 +11,18 @@
 @source '../**/*.js';
 
 @theme {
-    --color-primary: #F65812;
+    --color-primary: #f65812;
 }
 
-html, body {
-    @apply bg-neutral-200;
+html,
+body {
+    font-family: "DM Sans", sans-serif;
+    @apply bg-[#f5f2ea] text-neutral-900;
 }
 
 h1 {
-    @apply text-2xl text-center;
+    font-family: "Space Grotesk", sans-serif;
+    @apply tracking-tight;
 }
 
 div.container {

@@ -1,22 +1,26 @@
-<div>
-    <h1>Tankvorgang erfassen</h1>
+<div class="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 lg:py-16">
+    <div class="space-y-3">
+        <h1 class="text-left text-3xl font-semibold text-neutral-900 lg:text-4xl">
+            Tankvorgang erfassen
+        </h1>
+        <p class="text-neutral-600">
+            Erfasse den Tankvorgang direkt vor Ort. Die Angaben werden automatisch ins System übernommen.
+        </p>
+    </div>
 
-    <x-ui.alert class="my-6">
-        <strong>Probleme bei der Eingabe?</strong>
-        <u>Zählerstand</u> oder Foto und <u>Kennzeichen</u> an info@sportflugzentrum.de senden und die Daten werden nachgetragen!
-    </x-ui.alert>
+    <div class="rounded-2xl border border-white/80 bg-white/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur lg:p-8">
+        <form class="grid gap-6" wire:submit.prevent="save">
+            {{ $this->form }}
 
-    <form class="my-10" wire:submit.prevent="save">
-        {{ $this->form }}
+            <div class="pt-2">
+                <x-filament::button type="submit" class="w-full">
+                    Betankung speichern
+                </x-filament::button>
+            </div>
+        </form>
+    </div>
 
-        <div class="mt-6">
-            <x-filament::button type="submit" class="w-full">
-                Betankung speichern
-            </x-filament::button>
-        </div>
-    </form>
-
-    <div class="mt-12 text-center">
+    <div class="text-left">
         <a href="{{ route('home') }}" class="link" wire:navigate>
             zurück
         </a>

@@ -16,22 +16,34 @@
         @livewireStyles
         @filamentStyles
     </head>
-    <body class="antialiased">
-        <div class="container">
-            <a class="flex justify-center" href="{{ url('/') }}">
-                <image class="h-24" src="{{ Vite::asset('resources/images/logo/logo.svg') }}" alt="Logo" />
-            </a>
+    <body class="antialiased bg-[#f5f2ea] text-neutral-900">
+        <div class="relative min-h-dvh overflow-hidden">
+            <div class="pointer-events-none absolute -left-40 -top-48 h-[28rem] w-[28rem] rounded-full bg-[#f65812]/20 blur-3xl"></div>
+            <div class="pointer-events-none absolute right-[-10rem] top-24 h-[26rem] w-[26rem] rounded-full bg-[#0b4f6c]/18 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-32 left-1/2 h-[30rem] w-[30rem] -translate-x-1/2 rounded-full bg-white/70 blur-3xl"></div>
 
-            {{ $slot }}
+            <header class="relative z-10">
+                <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
+                    <a class="flex items-center gap-3" href="{{ url('/') }}">
+                        <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/80 shadow-sm">
+                            <img class="h-8 w-8" src="{{ Vite::asset('resources/images/logo/brandsign.svg') }}" alt="Logo" />
+                        </span>
+                        <span class="text-sm font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                            {{ config('app.name') }}
+                        </span>
+                    </a>
+                    @if(auth()->user()?->isAdmin())
+                        <a href="{{ url('/admin') }}" target="_blank" class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 hover:text-neutral-700">
+                            Admin
+                        </a>
+                    @endif
+                </div>
+            </header>
+
+            <main class="relative z-10">
+                {{ $slot }}
+            </main>
         </div>
-
-        @if(auth()->user()?->isAdmin())
-            <div class="text-center">
-                <a href="{{ url('/admin') }}" target="_blank" class="text-neutral-700 text-xs hover:underline">
-                    admin
-                </a>
-            </div>
-        @endif
 
         @livewire('notifications')
         @filamentScripts

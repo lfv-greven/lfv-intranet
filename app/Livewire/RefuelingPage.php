@@ -61,7 +61,6 @@ class RefuelingPage extends Component implements HasActions, HasForms
     {
         return $schema
             ->statePath('data')
-            ->columns(2)
             ->components([
                 Fieldset::make('Tankstelle wählen')
                     ->schema([
