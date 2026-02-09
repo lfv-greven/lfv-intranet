@@ -20,10 +20,6 @@
     </form>
 
     <div class="mt-10 text-center">
-        <a href="{{ route('home') }}" class="link" wire:navigate>
-            Ohne Login fortfahren
-        </a>
-        |
         <a href="https://vereinsflieger.de/PasswortAnfordern" target="_blank" class="link">
             Passwort anfordern
         </a>

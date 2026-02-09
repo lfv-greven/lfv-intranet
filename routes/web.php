@@ -10,12 +10,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
 
-Route::get('/home', HomePage::class)->name('home');
-Route::get('/tanken', RefuelingPage::class)->name('refueling');
-Route::livewire('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
-Route::get('/oil', OilLogPage::class)->name('oil');
-
 Route::middleware('auth')->group(function () {
+    Route::get('/home', HomePage::class)->name('home');
+    Route::get('/tanken', RefuelingPage::class)->name('refueling');
+    Route::livewire('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
+    Route::get('/oil', OilLogPage::class)->name('oil');
     Route::get('/auslagen', \App\Livewire\ExpensesPage::class)->name('expenses');
     Route::get('/chat', ChatSettingsPage::class)->name('chat');
     Route::get('/department', \App\Livewire\DepartmentPage::class)->name('department');
