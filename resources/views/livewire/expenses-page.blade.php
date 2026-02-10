@@ -30,14 +30,12 @@
             </p>
         </div>
 
-        <div class="rounded-2xl border border-white/80 bg-white/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur lg:p-8">
-            <form class="grid gap-6" wire:submit.prevent="store">
-                {{ $this->form }}
+        <form class="grid gap-6" wire:submit.prevent="store">
+            {{ $this->form }}
 
-                <x-filament::button class="w-full" type="submit">
-                    Beleg einreichen
-                </x-filament::button>
-            </form>
-        </div>
+            <x-filament::button class="w-full" type="submit">
+                Beleg einreichen
+            </x-filament::button>
+        </form>
     @endif
 </div>

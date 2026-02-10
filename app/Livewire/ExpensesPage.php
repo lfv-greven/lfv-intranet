@@ -10,7 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -54,7 +54,7 @@ class ExpensesPage extends Component implements HasActions, HasForms
             ->statePath('data')
             ->model(Expense::class)
             ->components([
-                Fieldset::make('Beleg')
+                Section::make('')
                     ->columns(1)
                     ->schema([
                         TextInput::make('reason')
