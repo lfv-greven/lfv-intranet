@@ -37,6 +37,11 @@ class ExpenseResource extends Resource
         return Expense::open()->count();
     }
 
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return Expense::open()->count() > 0 ? 'info' : 'gray';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema
