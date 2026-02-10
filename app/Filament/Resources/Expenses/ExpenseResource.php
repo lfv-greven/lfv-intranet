@@ -86,6 +86,7 @@ class ExpenseResource extends Resource
                 SelectColumn::make('status')
                     ->selectablePlaceholder(false)
                     ->alignRight()
+                    ->disabled(fn (Expense $record) => empty($record->iban) || $record->status == ExpenseStatus::APPROVED)
                     ->options(ExpenseStatus::class),
             ])
             ->filters([
@@ -111,13 +112,12 @@ class ExpenseResource extends Resource
                     ->color('gray')
                     ->iconButton()
                     ->icon('heroicon-s-eye')
-                    ->openUrlInNewTab()
                     ->url(function ($record) {
                         return Storage::temporaryUrl(
                             $record->receipt_filename,
                             now()->addMinute(),
                         );
-                    }),
+                    }, shouldOpenInNewTab: true),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
