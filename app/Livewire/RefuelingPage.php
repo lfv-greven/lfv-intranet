@@ -11,9 +11,10 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use Livewire\Component;
@@ -25,10 +26,15 @@ class RefuelingPage extends Component implements HasActions, HasForms
 
     public array $data = [];
 
-    public function mount()
+    public function mount(): void
     {
         $this->form->fill([
-            'buyer_name' => auth()->user()?->name,
+            'gas_station_id' => null,
+            'aircraft_id' => null,
+            'buyer_registration' => null,
+            'counter_reading' => null,
+            'amount' => null,
+            'comment' => null,
         ]);
     }
 
@@ -47,7 +53,7 @@ class RefuelingPage extends Component implements HasActions, HasForms
             'gas_station_id' => $data->gas_station_id,
             'date' => now(),
             'aircraft_id' => $data->aircraft_id,
-            'buyer_name' => $data->buyer_name,
+            'buyer_name' => auth()->user()->name,
             'buyer_registration' => $reg,
             'counter_reading' => $data->counter_reading,
             'amount' => $data->amount,
@@ -62,12 +68,12 @@ class RefuelingPage extends Component implements HasActions, HasForms
         return $schema
             ->statePath('data')
             ->components([
-                Fieldset::make('Tankstelle wählen')
+                Section::make('Tankstelle wählen')
                     ->schema([
-                        Select::make('gas_station_id')
+                        ToggleButtons::make('gas_station_id')
                             ->required()
-                            ->placeholder('')
-                            ->label('Tankstelle')
+                            ->inline()
+                            ->label('Tankstelle wählen')
                             ->columnSpanFull()
                             ->live()
                             ->helperText(function ($state) {
@@ -85,16 +91,9 @@ class RefuelingPage extends Component implements HasActions, HasForms
                             })
                             ->options(GasStation::pluck('name', 'id')),
 
-                        TextInput::make('buyer_name')
-                            ->placeholder('Max Mustermann')
-                            ->label('Name')
-                            ->label('Name des Piloten')
-                            ->columnSpanFull()
-                            ->required(),
-
                         Select::make('aircraft_id')
                             ->placeholder('Fremdes LFZ/KFZ')
-                            ->label('Flugzeug')
+                            ->label('Flugzeug auswählen')
                             ->live()
                             ->afterStateUpdated(function ($state, $set) {
                                 if (! $state) {
@@ -111,13 +110,13 @@ class RefuelingPage extends Component implements HasActions, HasForms
                             ]),
 
                         TextInput::make('buyer_registration')
-                            ->disabled(fn ($get) => $get('aircraft_id'))
+                            ->hidden(fn ($get) => $get('aircraft_id'))
                             ->label('Kennzeichen')
                             ->placeholder('D-EABC')
                             ->required(),
                     ]),
 
-                Fieldset::make('Betankung erfassen')
+                Section::make('Betankung erfassen')
                     ->visible(fn ($get) => filled($get('gas_station_id')))
                     ->schema([
                         TextInput::make('counter_reading')

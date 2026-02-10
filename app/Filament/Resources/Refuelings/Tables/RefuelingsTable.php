@@ -11,6 +11,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\DB;
@@ -83,6 +84,10 @@ class RefuelingsTable
                         }
                     })
                     ->suffix(' l'),
+                IconColumn::make('comment')
+                    ->label('')
+                    ->tooltip(fn ($state) => 'Kommentar des Piloten: '.$state)
+                    ->icon('heroicon-s-chat-bubble-oval-left-ellipsis'),
             ])
             ->recordActions([
                 Action::make('send_vf')
