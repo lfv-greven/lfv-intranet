@@ -94,15 +94,19 @@ class RefuelingsTable
                     ->icon('heroicon-s-banknotes')
                     ->iconButton()
                     ->tooltip('Verkauf an Vereinsflieger übertragen')
-                    ->visible(fn ($record) => $record->type == RefuelingType::refueling && ! $record->aircraft?->owned)
-                    ->disabled(function (Refueling $record) {
-                        if ($record->isExported()) {
-                            return true;
-                        } elseif (! $record->gasStation->vf_articleid) {
-                            return true;
-                        }
+                    ->visible(function (Refueling $record) {
+                        return
+                            // Only bill refuelings, not fillings
+                            $record->type == RefuelingType::refueling
 
-                        return false;
+                            // Only bill non community planes
+                            && ! $record->aircraft?->owned
+
+                            // Prevent already exported
+                            && ! $record->isExported()
+
+                            // Article is not yet configured for export
+                            && filled($record->gasStation->vf_articleid);
                     })
                     ->action(function (Refueling $record) {
                         SendRefueling::dispatch($record);
