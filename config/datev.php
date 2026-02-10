@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'datev_uploadmail' => env('DATEV_UPLOADMAIL_TO'),
+    'uploadmail_to' => env('DATEV_UPLOADMAIL_TO'),
 ];

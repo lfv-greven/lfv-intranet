@@ -35,6 +35,9 @@ class NotifyUserAboutApproval extends Notification implements ShouldQueue
         return (new MailMessage)
             ->subject('Auslage wurde geprüft')
             ->greeting('Hey '.$notifiable->name.',')
-            ->line('Deine eingereichte Auslage wurde geprüft und wird nun auf dein hinterlegtes Konto erstattet.');
+            ->line(sprintf(
+                'Deine eingereichte Auslage wurde geprüft und wird nun auf dein hinterlegtes Konto (%s) erstattet.',
+                iban_to_obfuscated_format($this->expense->iban),
+            ));
     }
 }

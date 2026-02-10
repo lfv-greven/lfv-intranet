@@ -32,7 +32,7 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
             return;
         }
 
-        $this->expense->iban = data_get($bankData, 'iban');
+        $this->expense->iban = iban_to_machine_format(data_get($bankData, 'iban'));
         $this->expense->bic = data_get($bankData, 'bic');
         $this->expense->saveQuietly();
     }

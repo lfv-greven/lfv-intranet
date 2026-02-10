@@ -13,6 +13,7 @@
         "filament/forms": "^5.0",
         "filament/notifications": "^5.0",
         "flowframe/laravel-trend": "^0.4.0",
+        "globalcitizen/php-iban": "^4.2",
         "larabug/larabug": "dev-master",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.9",

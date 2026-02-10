@@ -49,6 +49,8 @@ class Expense extends Model
     protected function casts(): array
     {
         return [
+            'iban' => 'encrypted',
+            'bic' => 'encrypted',
             'status' => ExpenseStatus::class,
         ];
     }

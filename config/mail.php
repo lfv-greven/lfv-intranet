@@ -48,15 +48,6 @@ return [
             'local_domain' => env('MAIL_EHLO_DOMAIN'),
         ],
 
-        'allinkl' => [
-            'transport' => 'smtp',
-            'host' => 'w00a98ce.kasserver.com',
-            'port' => 465,
-            'encryption' => 'tls',
-            'username' => env('MAIL_ALLINKL_USERNAME'),
-            'password' => env('MAIL_ALLINKL_PASSWORD'),
-        ],
-
         'ses' => [
             'transport' => 'ses',
         ],

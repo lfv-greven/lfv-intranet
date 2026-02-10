@@ -70,6 +70,7 @@ class ExpenseResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->poll('5s')
             ->columns([
                 TextColumn::make('id')
                     ->copyable()
@@ -85,7 +86,8 @@ class ExpenseResource extends Resource
                 TextColumn::make('iban')
                     ->label('IBAN')
                     ->copyable()
-                    ->copyMessage('Kopiert'),
+                    ->copyMessage('Kopiert')
+                    ->formatStateUsing(fn ($state) => iban_to_obfuscated_format($state)),
                 SelectColumn::make('status')
                     ->selectablePlaceholder(false)
                     ->alignRight()

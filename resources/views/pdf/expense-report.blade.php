@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Auslagenerstattung - LfV Greven</title>
-    
+
     <style>
         {!! Vite::content('resources/css/pdf/expense-report.css') !!}
     </style>
@@ -29,7 +29,7 @@
             <tbody>
             <tr>
                 <th>IBAN:</th>
-                <td>{{ $expense->iban }}</td>
+                <td>{{ iban_to_human_format($expense->iban) }}</td>
             </tr>
             <tr>
                 <th>BIC:</th>
