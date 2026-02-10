@@ -10,20 +10,6 @@
             <p class="text-lg text-neutral-600">
                 Melde dich mit deinen Vereinsflieger‑Zugangsdaten an und verwalte deine Vorgänge an einem Ort.
             </p>
-            <div class="grid gap-3 text-sm text-neutral-500">
-                <div class="flex items-center gap-3">
-                    <span class="h-2 w-2 rounded-full bg-[#f65812]"></span>
-                    Sicherer Zugriff nur für Mitglieder
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="h-2 w-2 rounded-full bg-[#f65812]"></span>
-                    Optimiert für mobile Geräte
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="h-2 w-2 rounded-full bg-[#f65812]"></span>
-                    Schnelle Workflows ohne Umwege
-                </div>
-            </div>
         </div>
 
         <div class="rounded-2xl border border-white/80 bg-white/80 p-6 shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur lg:p-8">
