@@ -7,8 +7,6 @@ use App\Filament\Resources\Expenses\Pages\ManageExpenses;
 use App\Jobs\EnrichExpenseWithIban;
 use App\Models\Expense;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -118,11 +116,6 @@ class ExpenseResource extends Resource
                             now()->addMinute(),
                         );
                     }, shouldOpenInNewTab: true),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
             ]);
     }
 
