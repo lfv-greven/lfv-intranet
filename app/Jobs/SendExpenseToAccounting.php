@@ -27,7 +27,7 @@ class SendExpenseToAccounting implements ShouldBeUnique, ShouldQueue
         GenerateExpenseReport::dispatchSync($this->expense);
         $this->expense->refresh();
 
-        Mail::raw(sprintf(
+        Mail::mailer('allinkl')->raw(sprintf(
             "Erstattung ID: %s\nFür: %s",
             $this->expense->id,
             $this->expense->user->name,
