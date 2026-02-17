@@ -15,6 +15,8 @@ class TrainingFundReportService
         'Ultraleicht - Aerodynamisch',
     ];
 
+    private const FTID_FILTER = [2, 8, 12];
+
     public function calculateForMonth(Carbon $month, bool $overwrite = false): TrainingFundReport
     {
         $month = $month->copy()->startOfMonth();
@@ -50,7 +52,8 @@ class TrainingFundReportService
             $to = $month->copy()->endOfMonth();
 
             $flights = $this->fetchFlights($from, $to);
-            $filtered = $this->filterFlights($flights);
+            $baseFiltered = $this->filterFlights($flights);
+            $filtered = $this->filterFlightsByFtid($baseFiltered);
 
             $motorUlMinutes = $filtered
                 ->filter(fn (array $flight) => in_array((string) Arr::get($flight, 'planetype'), self::MOTOR_UL_PLANE_TYPES, true))
@@ -60,12 +63,23 @@ class TrainingFundReportService
             $winchStarts = $filtered
                 ->filter(fn (array $flight) => (int) Arr::get($flight, 'starttype') === 5)
                 ->filter(fn (array $flight) => (int) Arr::get($flight, 'iscommunityplane', 0) === 1)
+                ->filter(fn (array $flight) => count(Arr::get($flight, 'invoiceinfo', [])) > 0)
                 ->count();
 
-            $towMinutes = $filtered
+            $gliderFlights = $filtered
+                ->filter(fn (array $flight) => (int) Arr::get($flight, 'starttype') === 3)
+                ->filter(fn (array $flight) => (int) Arr::get($flight, 'flidtow', 0) > 0);
+
+            $towFlightsById = $baseFiltered->keyBy(fn (array $flight) => (string) Arr::get($flight, 'flid'));
+            $towFlights = $gliderFlights
+                ->map(fn (array $flight) => (string) Arr::get($flight, 'flidtow'))
+                ->filter()
+                ->unique()
+                ->map(fn (string $flid) => $towFlightsById->get($flid))
+                ->filter();
+
+            $towMinutes = $towFlights
                 ->filter(fn (array $flight) => (int) Arr::get($flight, 'starttype') === 1)
-                ->filter(fn (array $flight) => (int) Arr::get($flight, 'flidtow', 0) > 0)
-                ->filter(fn (array $flight) => (int) Arr::get($flight, 'towtime', 0) > 0)
                 ->filter(fn (array $flight) => (int) Arr::get($flight, 'iscommunityplane', 0) === 1)
                 ->sum(fn (array $flight) => max(0, (int) Arr::get($flight, 'flighttime', 0)));
 
@@ -165,6 +179,13 @@ class TrainingFundReportService
             ->filter(fn (array $flight) => (int) Arr::get($flight, 'deleted', 0) === 0)
             ->filter(fn (array $flight) => (int) Arr::get($flight, 'duplicate', 0) === 0)
             ->filter(fn (array $flight) => (int) Arr::get($flight, 'chargemode', 0) !== 1)
+            ->values();
+    }
+
+    private function filterFlightsByFtid($flights)
+    {
+        return $flights
+            ->filter(fn (array $flight) => in_array((int) Arr::get($flight, 'ftid'), self::FTID_FILTER, true))
             ->values();
     }
 
