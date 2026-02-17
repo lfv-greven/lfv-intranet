@@ -66,6 +66,7 @@ return [
     */
 
     'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'schedule_timezone' => 'Europe/Berlin',
 
     /*
     |--------------------------------------------------------------------------
