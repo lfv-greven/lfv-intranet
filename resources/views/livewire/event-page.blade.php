@@ -21,6 +21,8 @@
                            name="enrollment_{{ $event->id }}"
                            id="enrollment_{{ $slot->id }}"
                            class="text-green-500"
+                           data-umami-event="event_slot_selected"
+                           data-umami-event-slot_state="{{ $slot->start_time->isPast() || $slot->free_seats <= 0 ? 'closed' : 'open' }}"
                            value="{{ $slot->id }}"
                            wire:model.live="enrolledTo"
                            @if($slot->free_seats <= 0 || $slot->start_time->isPast()) disabled @endif
@@ -42,6 +44,7 @@
                 wire:click="deleteEnrollment()"
                 wire:confirm="Möchtest du wirklich deine Anmeldung löschen?"
                 tag="button"
+                data-umami-event="event_enrollment_delete_clicked"
             >
                 Meine Anmeldung löschen
             </x-filament::link>

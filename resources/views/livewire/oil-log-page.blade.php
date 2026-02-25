@@ -8,7 +8,7 @@
         </p>
     </div>
 
-    <form class="grid gap-6" wire:submit.prevent="save">
+    <form class="grid gap-6" wire:submit.prevent="save" x-data x-on:focusin.once="window.trackUmamiEvent('oil_log_start')">
         {{ $this->form }}
 
         <div class="pt-2">
@@ -19,7 +19,7 @@
     </form>
 
     <div class="text-left">
-        <a href="{{ route('home') }}" class="link" wire:navigate>
+        <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="oil_log_back_clicked">
             zurück
         </a>
     </div>

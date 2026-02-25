@@ -17,10 +17,16 @@ class EventPage extends Component
     public function mount()
     {
         $this->enrolledTo = $this->event->enrollment?->event_slot_id;
+
+        $this->dispatch('umami-track', name: 'event_page_viewed', data: [
+            'has_existing_enrollment' => filled($this->enrolledTo),
+        ]);
     }
 
     public function updatedEnrolledTo($id)
     {
+        $this->dispatch('umami-track', name: 'event_enrollment_attempt');
+
         // Recheck free seats
         $slot = EventSlot::find($id);
         abort_unless($slot->free_seats > 0, 403);
@@ -39,10 +45,16 @@ class EventPage extends Component
             ->title('Erfolg')
             ->body('Deine Anmeldung wurde gespeichert.')
             ->send();
+
+        $this->dispatch('umami-track', name: 'event_enrollment_success', data: [
+            'has_selection' => true,
+        ]);
     }
 
     public function deleteEnrollment()
     {
+        $this->dispatch('umami-track', name: 'event_enrollment_delete_attempt');
+
         $enrollment = $this->event->enrollment;
 
         abort_if($enrollment->slot->start_time->isPast(), 403);
@@ -56,6 +68,8 @@ class EventPage extends Component
             ->send();
 
         $this->enrolledTo = null;
+
+        $this->dispatch('umami-track', name: 'event_enrollment_delete_success');
     }
 
     public function render()

@@ -13,6 +13,9 @@
         </style>
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @production
+            <script defer src="https://analytics.sportflugzentrum.de/script.js" data-website-id="37271ba7-0db8-4676-8811-54b81bc0368c"></script>
+        @endproduction
         @livewireStyles
         @filamentStyles
     </head>
@@ -24,7 +27,7 @@
 
             <header class="relative z-10">
                 <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
-                    <a class="flex items-center gap-3" href="{{ url('/') }}">
+                    <a class="flex items-center gap-3" href="{{ url('/') }}" data-umami-event="header_logo_clicked">
                         <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white/80 shadow-sm">
                             <img class="h-8 w-8" src="{{ Vite::asset('resources/images/logo/brandsign.svg') }}" alt="Logo" />
                         </span>
@@ -33,7 +36,7 @@
                         </span>
                     </a>
                     @if(auth()->user()?->isAdmin())
-                        <a href="{{ url('/admin') }}" target="_blank" class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 hover:text-neutral-700">
+                        <a href="{{ url('/admin') }}" target="_blank" class="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500 hover:text-neutral-700" data-umami-event="admin_link_clicked">
                             Admin
                         </a>
                     @endif

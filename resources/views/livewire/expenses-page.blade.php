@@ -14,7 +14,7 @@
             </p>
 
             <div class="mt-6">
-                <x-filament::link :href="url('/')">
+                <x-filament::link :href="url('/')" data-umami-event="expense_success_back_clicked">
                     Zurück
                 </x-filament::link>
             </div>
@@ -30,7 +30,7 @@
             </p>
         </div>
 
-        <form class="grid gap-6" wire:submit.prevent="store">
+        <form class="grid gap-6" wire:submit.prevent="store" x-data x-on:focusin.once="window.trackUmamiEvent('expense_start')">
             {{ $this->form }}
 
             <x-filament::button class="w-full" type="submit">

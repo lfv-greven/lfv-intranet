@@ -14,8 +14,10 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Throwable;
 
 class OilLogPage extends Component implements HasActions, HasForms
 {
@@ -42,26 +44,46 @@ class OilLogPage extends Component implements HasActions, HasForms
 
     public function save()
     {
-        if (! $this->form->validate()) {
-            return;
+        $this->dispatch('umami-track', name: 'oil_log_submit_attempt');
+
+        try {
+            $this->form->validate();
+        } catch (ValidationException $exception) {
+            $this->dispatch('umami-track', name: 'oil_log_submit_error', data: [
+                'error_type' => 'validation',
+            ]);
+
+            throw $exception;
         }
 
-        $data = $this->form->getState();
+        try {
+            $data = $this->form->getState();
 
-        $aircraft = Aircraft::findOrFail($data['aircraft_id']);
-        $aircraft->oilLogs()->create([
-            'user_id' => auth()->id(),
-            'pilot' => auth()->user()->name,
-            'registration' => $aircraft->registration,
-            'oil_level' => $data['oil_level'],
-            'oil_refilled' => $data['oil_refilled'],
-        ]);
+            $aircraft = Aircraft::findOrFail($data['aircraft_id']);
+            $aircraft->oilLogs()->create([
+                'user_id' => auth()->id(),
+                'pilot' => auth()->user()->name,
+                'registration' => $aircraft->registration,
+                'oil_level' => $data['oil_level'],
+                'oil_refilled' => $data['oil_refilled'],
+            ]);
+        } catch (Throwable $exception) {
+            $this->dispatch('umami-track', name: 'oil_log_submit_error', data: [
+                'error_type' => 'save_failure',
+            ]);
+
+            throw $exception;
+        }
 
         Notification::make()
             ->success()
             ->title('Ölstand wurde erfasst.')
             ->body('Danke für deine Mithilfe!')
             ->send();
+
+        $this->dispatch('umami-track', name: 'oil_log_submit_success', data: [
+            'oil_level_type' => $this->oilLevelType?->value ?? 'unknown',
+        ]);
 
         return $this->redirectRoute('home', navigate: true);
     }
@@ -88,6 +110,9 @@ class OilLogPage extends Component implements HasActions, HasForms
 
                                 $set('oil_level', $aircraft->getOilLevel());
                                 $this->oilLevelType = $aircraft->oil_level_type;
+                                $this->dispatch('umami-track', name: 'oil_log_aircraft_selected', data: [
+                                    'oil_level_type' => $aircraft->oil_level_type?->value ?? 'unknown',
+                                ]);
                             })
                             ->options(Aircraft::owned()->pluck('registration', 'id')),
 

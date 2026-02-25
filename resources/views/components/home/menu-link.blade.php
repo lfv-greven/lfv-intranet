@@ -8,6 +8,7 @@
     href="{{ $href }}"
     class="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-white hover:shadow-[0_28px_70px_rgba(15,23,42,0.18)]"
     target="{{ $external ? '_blank' : '_self' }}"
+    {{ $attributes }}
     @unless($external) wire:navigate=false @endif
 >
     <div class="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-[#f65812]/15 blur-2xl transition group-hover:bg-[#f65812]/25"></div>

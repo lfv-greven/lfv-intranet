@@ -13,7 +13,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Throwable;
 
 class ExpensesPage extends Component implements HasActions, HasForms
 {
@@ -30,22 +32,44 @@ class ExpensesPage extends Component implements HasActions, HasForms
 
     public function store()
     {
-        $this->validate();
+        $this->dispatch('umami-track', name: 'expense_submit_attempt');
 
-        DB::transaction(function () {
-            $files = data_get($this->data, 'files');
-            foreach ($files as $file) {
-                $filename = $file->store('expenses');
+        try {
+            $this->validate();
+        } catch (ValidationException $exception) {
+            $this->dispatch('umami-track', name: 'expense_submit_error', data: [
+                'error_type' => 'validation',
+            ]);
 
-                Expense::create([
-                    'user_id' => auth()->id(),
-                    'reason' => $this->data['reason'],
-                    'receipt_filename' => $filename,
-                ]);
-            }
-        });
+            throw $exception;
+        }
+
+        try {
+            DB::transaction(function () {
+                $files = data_get($this->data, 'files');
+                foreach ($files as $file) {
+                    $filename = $file->store('expenses');
+
+                    Expense::create([
+                        'user_id' => auth()->id(),
+                        'reason' => $this->data['reason'],
+                        'receipt_filename' => $filename,
+                    ]);
+                }
+            });
+        } catch (Throwable $exception) {
+            $this->dispatch('umami-track', name: 'expense_submit_error', data: [
+                'error_type' => 'save_failure',
+            ]);
+
+            throw $exception;
+        }
 
         $this->saved = true;
+
+        $this->dispatch('umami-track', name: 'expense_submit_success', data: [
+            'receipt_count' => count(data_get($this->data, 'files', [])),
+        ]);
     }
 
     public function form(Schema $schema): Schema

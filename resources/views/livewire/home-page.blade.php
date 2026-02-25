@@ -17,6 +17,7 @@
 
     @if($event)
         <a href="{{ route('event', ['event' => $event->id]) }}"
+           data-umami-event="home_event_banner_clicked"
            class="group relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl">
             <div class="absolute right-0 top-0 h-24 w-24 rounded-full bg-emerald-200/40 blur-2xl"></div>
             <span class="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-600">Anmeldung</span>
@@ -26,32 +27,32 @@
     @endif
 
     <div class="grid gap-4 md:grid-cols-2">
-        <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')">
+        <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')" data-umami-event="home_menu_clicked" data-umami-event-target="refueling">
             Tanken erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.png')">
+        <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.png')" data-umami-event="home_menu_clicked" data-umami-event-target="oil_log">
             Ölstand erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')">
+        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')" data-umami-event="home_menu_clicked" data-umami-event-target="expenses">
             Auslagenerstattung
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.png')">
+        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.png')" data-umami-event="home_menu_clicked" data-umami-event-target="chat">
             LfV-Chat
         </x-home.menu-link>
     </div>
 
     @auth
         <div class="pt-6">
-            <x-filament::link wire:click="signOut()" wire:confirm="Möchtest du dich wirklich abmelden?" tag="button">
+            <x-filament::link wire:click="signOut()" wire:confirm="Möchtest du dich wirklich abmelden?" tag="button" data-umami-event="sign_out_clicked">
                 abmelden
             </x-filament::link>
         </div>
     @else
         <div class="pt-6">
-            <a href="{{ route('login') }}" wire:navigate class="link">
+            <a href="{{ route('login') }}" wire:navigate class="link" data-umami-event="home_login_link_clicked">
                 anmelden
             </a>
         </div>

@@ -11,6 +11,7 @@
 
     <div class="grid gap-4 md:grid-cols-2">
         <a href="https://apps.apple.com/de/app/mattermost/id1257222717?itsct=apps_box_link&itscg=30200" target="_blank"
+           data-umami-event="chat_app_store_clicked"
            class="group flex items-center justify-between rounded-2xl border border-white/80 bg-white/80 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(15,23,42,0.18)]">
             <div class="flex items-center gap-4">
                 <div class="grid h-12 w-12 place-items-center rounded-2xl bg-[#f3ede2] ring-1 ring-white/70">
@@ -25,6 +26,7 @@
         </a>
 
         <a href="https://play.google.com/store/apps/details?id=com.mattermost.rn" target="_blank"
+           data-umami-event="chat_google_play_clicked"
            class="group flex items-center justify-between rounded-2xl border border-white/80 bg-white/80 p-5 shadow-[0_18px_50px_rgba(15,23,42,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_28px_70px_rgba(15,23,42,0.18)]">
             <div class="flex items-center gap-4">
                 <div class="grid h-12 w-12 place-items-center rounded-2xl bg-[#f3ede2] ring-1 ring-white/70">
@@ -64,7 +66,7 @@
                 <span class="text-neutral-500">Passwort</span>
                 <span class="font-semibold text-neutral-900">
                     ••••••
-                    <button wire:click="$dispatch('openModal', {component: 'chat.reset-passwort-modal'})" class="ml-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-[#e24f12]">
+                    <button wire:click="$dispatch('openModal', {component: 'chat.reset-passwort-modal'})" class="ml-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-[#e24f12]" data-umami-event="chat_password_reset_modal_opened">
                         zurücksetzen
                     </button>
                 </span>
@@ -73,7 +75,7 @@
     </div>
 
     <div class="text-left">
-        <a href="{{ route('home') }}" class="link" wire:navigate>
+        <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="chat_back_clicked">
             zurück
         </a>
     </div>

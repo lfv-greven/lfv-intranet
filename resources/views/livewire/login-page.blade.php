@@ -18,7 +18,12 @@
                 Bitte melde dich mit deinen Vereinsflieger‑Zugangsdaten an.
             </p>
 
-            <form class="mt-6 grid gap-4" wire:submit.prevent="login">
+            <form
+                class="mt-6 grid gap-4"
+                wire:submit.prevent="login"
+                x-data
+                x-on:focusin.once="window.trackUmamiEvent('login_start')"
+            >
                 @if($error)
                     <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                         <strong>Fehler:</strong>
@@ -34,7 +39,7 @@
             </form>
 
             <div class="mt-6 text-center text-sm text-neutral-500">
-                <a href="https://vereinsflieger.de/PasswortAnfordern" target="_blank" class="link">
+                <a href="https://vereinsflieger.de/PasswortAnfordern" target="_blank" class="link" data-umami-event="password_reset_link_clicked">
                     Passwort anfordern
                 </a>
             </div>

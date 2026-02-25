@@ -39,3 +39,17 @@
 ## Security & Configuration Tips
 - Copy `.env.example` to `.env` and set `APP_KEY` before running locally.
 - Never commit secrets; use environment variables for credentials and API keys.
+
+## Analytics Event Guidelines (Umami)
+
+- Prefer `data-umami-event` for simple, static click tracking on links/buttons.
+- Use `window.trackUmamiEvent(name, data)` (programmatic tracking) for dynamic interactions:
+  - form lifecycle (`start`, `attempt`, `success`, `error`)
+  - selected values (filters, dropdown choices)
+  - interactions with existing Alpine logic (menus, sliders, lightboxes, map consent)
+- Keep event names in `snake_case`.
+- Keep property keys in `snake_case` and values categorical where possible.
+- Reuse existing event names and properties before introducing new ones.
+- Do not send personal data or free text in tracking payloads:
+  - no name, email, phone, message content, or other PII
+- If a new event is added or changed, update `README.md` (`Umami Event Tracking` section) in the same change.

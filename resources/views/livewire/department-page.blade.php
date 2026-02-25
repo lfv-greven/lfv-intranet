@@ -2,7 +2,7 @@
     <h1>Mein Engagement</h1>
     <p class="text-center my-4 text-sm">
         Wähle dein Team aus, für das du dich Engagieren möchtest. Eine Änderung ist immer zum Jahreswechsel möglich.
-        <a href="{{ route('department.descriptions-team') }}" target="_blank" class="link">Team-Beschreibungen ansehen</a>
+        <a href="{{ route('department.descriptions-team') }}" target="_blank" class="link" data-umami-event="department_descriptions_clicked">Team-Beschreibungen ansehen</a>
     </p>
 
     @if(auth()->user()->department_id)
@@ -12,7 +12,7 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="store">
+    <form wire:submit.prevent="store" x-data x-on:focusin.once="window.trackUmamiEvent('department_start')">
         {{ $this->form }}
 
         <x-filament::button class="mt-4 w-full" type="submit">

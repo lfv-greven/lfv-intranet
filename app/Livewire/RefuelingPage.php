@@ -17,7 +17,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
+use Throwable;
 
 class RefuelingPage extends Component implements HasActions, HasForms
 {
@@ -40,24 +42,45 @@ class RefuelingPage extends Component implements HasActions, HasForms
 
     public function save()
     {
-        if (! $this->form->validate()) {
-            return;
+        $this->dispatch('umami-track', name: 'refueling_submit_attempt');
+
+        try {
+            $this->form->validate();
+        } catch (ValidationException $exception) {
+            $this->dispatch('umami-track', name: 'refueling_submit_error', data: [
+                'error_type' => 'validation',
+            ]);
+
+            throw $exception;
         }
 
-        $data = fluent($this->form->getState());
-        $reg = $data->buyer_registration ?? Aircraft::find($data->aircraft_id)->registration;
+        try {
+            $data = fluent($this->form->getState());
+            $reg = $data->buyer_registration ?? Aircraft::find($data->aircraft_id)->registration;
 
-        Refueling::create([
-            'user_id' => auth()->id(),
-            'type' => RefuelingType::refueling,
-            'gas_station_id' => $data->gas_station_id,
-            'date' => now(),
-            'aircraft_id' => $data->aircraft_id,
-            'buyer_name' => auth()->user()->name,
-            'buyer_registration' => $reg,
-            'counter_reading' => $data->counter_reading,
-            'amount' => $data->amount,
-            'comment' => $data->comment,
+            Refueling::create([
+                'user_id' => auth()->id(),
+                'type' => RefuelingType::refueling,
+                'gas_station_id' => $data->gas_station_id,
+                'date' => now(),
+                'aircraft_id' => $data->aircraft_id,
+                'buyer_name' => auth()->user()->name,
+                'buyer_registration' => $reg,
+                'counter_reading' => $data->counter_reading,
+                'amount' => $data->amount,
+                'comment' => $data->comment,
+            ]);
+        } catch (Throwable $exception) {
+            $this->dispatch('umami-track', name: 'refueling_submit_error', data: [
+                'error_type' => 'save_failure',
+            ]);
+
+            throw $exception;
+        }
+
+        $this->dispatch('umami-track', name: 'refueling_submit_success', data: [
+            'gas_station_selected' => filled($data->gas_station_id),
+            'aircraft_selected' => filled($data->aircraft_id),
         ]);
 
         return $this->redirectRoute('refueling.success', navigate: true);
@@ -76,6 +99,15 @@ class RefuelingPage extends Component implements HasActions, HasForms
                             ->label('Tankstelle wählen')
                             ->columnSpanFull()
                             ->live()
+                            ->afterStateUpdated(function ($state) {
+                                if (! $state) {
+                                    return;
+                                }
+
+                                $this->dispatch('umami-track', name: 'refueling_gas_station_selected', data: [
+                                    'has_selection' => true,
+                                ]);
+                            })
                             ->helperText(function ($state) {
                                 if (! $state) {
                                     return;
@@ -103,6 +135,10 @@ class RefuelingPage extends Component implements HasActions, HasForms
                                 $aircraft = Aircraft::find($state);
 
                                 $set('buyer_registration', $aircraft->registration);
+                                $this->dispatch('umami-track', name: 'refueling_aircraft_selected', data: [
+                                    'has_selection' => true,
+                                    'aircraft_type' => $aircraft->owned ? 'owned' : 'foreign',
+                                ]);
                             })
                             ->options([
                                 'Verein' => Aircraft::owned()->pluck('registration', 'id')->toArray(),

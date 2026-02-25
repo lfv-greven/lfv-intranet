@@ -13,8 +13,10 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Throwable;
 
 class DepartmentPage extends Component implements HasActions, HasForms
 {
@@ -57,6 +59,16 @@ class DepartmentPage extends Component implements HasActions, HasForms
                             ->disabled(fn () => ! $this->canChange)
                             ->helperText(fn () => $this->canChange ? '' : 'Das Ändern deines Team ist nur zum Jahresende möglich.')
                             ->label('Team')
+                            ->live()
+                            ->afterStateUpdated(function ($state) {
+                                if (! $state) {
+                                    return;
+                                }
+
+                                $this->dispatch('umami-track', name: 'department_selected', data: [
+                                    'has_selection' => true,
+                                ]);
+                            })
                             ->disableOptionWhen(function (string $value) {
                                 $department = Department::find($value);
 
@@ -90,13 +102,33 @@ class DepartmentPage extends Component implements HasActions, HasForms
 
     public function store()
     {
+        $this->dispatch('umami-track', name: 'department_submit_attempt');
+
+        try {
+            $this->form->validate();
+        } catch (ValidationException $exception) {
+            $this->dispatch('umami-track', name: 'department_submit_error', data: [
+                'error_type' => 'validation',
+            ]);
+
+            throw $exception;
+        }
+
         $user = auth()->user();
 
-        $user->department_id = $this->data['department_id'];
-        $user->department_note = $this->data['department_note'];
-        $user->department_lead_interest = $this->data['department_lead_interest'];
-        $user->department_joined_at = now();
-        $user->save();
+        try {
+            $user->department_id = $this->data['department_id'];
+            $user->department_note = $this->data['department_note'];
+            $user->department_lead_interest = $this->data['department_lead_interest'];
+            $user->department_joined_at = now();
+            $user->save();
+        } catch (Throwable $exception) {
+            $this->dispatch('umami-track', name: 'department_submit_error', data: [
+                'error_type' => 'save_failure',
+            ]);
+
+            throw $exception;
+        }
 
         Notification::make()
             ->success()
@@ -104,5 +136,7 @@ class DepartmentPage extends Component implements HasActions, HasForms
             ->send();
 
         $this->canChange = false;
+
+        $this->dispatch('umami-track', name: 'department_submit_success');
     }
 }
