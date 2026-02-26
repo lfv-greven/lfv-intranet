@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Uppercase;
 use App\Enums\RefuelingType;
+use App\Services\VereinsfliegerClient;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -150,7 +151,8 @@ class Refueling extends Model
         }
 
         Log::error('Failed to insert refueling sale', [
-            'vf_response' => $vf->GetResponse(),
+            'http_status' => $status,
+            'vf_response' => $response,
         ]);
 
         return false;
