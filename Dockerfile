@@ -2,11 +2,51 @@
 
 ARG PHP_VERSION=8.4
 
-FROM composer:2 AS vendor
+FROM php:${PHP_VERSION}-fpm-bookworm AS php-base
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    gettext-base \
+    libcurl4-openssl-dev \
+    libfreetype6-dev \
+    libicu-dev \
+    libjpeg62-turbo-dev \
+    libonig-dev \
+    libpng-dev \
+    libzip-dev \
+    libxml2-dev \
+    nginx \
+    supervisor \
+    unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j"$(nproc)" \
+        bcmath \
+        curl \
+        dom \
+        exif \
+        gd \
+        intl \
+        mbstring \
+        opcache \
+        pcntl \
+        pdo_mysql \
+        simplexml \
+        xml \
+        xmlreader \
+        xmlwriter \
+        zip \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+FROM php-base AS vendor
 WORKDIR /app
 
 COPY composer.json composer.lock ./
-RUN composer install \
+RUN --mount=type=cache,target=/tmp/composer-cache \
+    COMPOSER_CACHE_DIR=/tmp/composer-cache composer install \
     --no-dev \
     --no-interaction \
     --no-progress \
@@ -18,42 +58,22 @@ FROM node:22-alpine AS assets
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci
+
+COPY --from=vendor /app/vendor /app/vendor
 
 COPY resources ./resources
 COPY public ./public
 COPY vite.config.js ./
 RUN npm run build
 
-FROM php:${PHP_VERSION}-fpm-bookworm AS runtime
+FROM php-base AS runtime
 
-ENV APP_ENV=production
-ENV PORT=8080
+ENV APP_ENV=production \
+    PORT=8080 \
+    ENABLE_QUEUE_WORKER=true
 
 WORKDIR /var/www/html
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx \
-    supervisor \
-    curl \
-    gettext-base \
-    libicu-dev \
-    libzip-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    libxml2-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" \
-        bcmath \
-        exif \
-        gd \
-        intl \
-        opcache \
-        pcntl \
-        pdo_mysql \
-        zip \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY . .
 COPY --from=vendor /app/vendor ./vendor
@@ -66,7 +86,8 @@ COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
 COPY docker/supervisor /etc/supervisor/conf.d
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint
 
-RUN php artisan package:discover --ansi \
+RUN rm -f bootstrap/cache/*.php \
+    && php artisan package:discover --ansi \
     && php artisan optimize:clear --ansi \
     && rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default \
     && chmod +x /usr/local/bin/entrypoint \
