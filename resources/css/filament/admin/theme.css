@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import "../../../../vendor/filament/filament/resources/css/theme.css";
+
+@source '../../../../app/Filament';
+@source '../../../views/filament';
+@source '../../../views/**/*.blade.php';
+@source '../../../js/**/*.js';
+@source '../../../../storage/framework/views/*.php';
+
+@theme {
+    --color-primary: #f65812;
+}

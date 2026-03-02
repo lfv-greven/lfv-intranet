@@ -23,6 +23,7 @@
 - File names should match class names and namespaces (PSR-4 in `composer.json`).
 - Blade view files use `.blade.php` under `resources/views`.
 - Format PHP with Laravel Pint: `./vendor/bin/pint`.
+- Prefer Laravel syntax and Laravel helpers wherever it is reasonable (e.g. `Str`, `Arr`, collections, `blank()` / `filled()`, `data_get()`), instead of native PHP alternatives.
 
 ## Testing Guidelines
 - Tests live in `tests/Feature` and `tests/Unit` and use PHPUnit (`phpunit.xml`).
