@@ -11,7 +11,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Validation\ValidationException;
@@ -75,17 +74,11 @@ class OilLogPage extends Component implements HasActions, HasForms
             throw $exception;
         }
 
-        Notification::make()
-            ->success()
-            ->title('Ölstand wurde erfasst.')
-            ->body('Danke für deine Mithilfe!')
-            ->send();
-
         $this->dispatch('umami-track', name: 'oil_log_submit_success', data: [
             'oil_level_type' => $this->oilLevelType?->value ?? 'unknown',
         ]);
 
-        return $this->redirectRoute('home', navigate: true);
+        return $this->redirectRoute('oil.success', navigate: true);
     }
 
     public function form(Schema $schema): Schema

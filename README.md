@@ -65,6 +65,7 @@ pnpm dev
 - `oil_log_submit_attempt`
 - `oil_log_submit_success`
 - `oil_log_submit_error` (`error_type`: `validation`, `save_failure`)
+- `oil_log_success_home_clicked`
 - `oil_log_back_clicked`
 - `expense_start`
 - `expense_submit_attempt`
