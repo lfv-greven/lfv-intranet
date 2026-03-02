@@ -6,6 +6,7 @@ use App\Enums\OilLevelType;
 use App\Models\Aircraft;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
@@ -14,6 +15,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -120,6 +122,15 @@ class OilLogPage extends Component implements HasActions, HasForms
                                     ->pluck('registration', 'id')
                             ),
 
+                        Placeholder::make('oil_refill_info')
+                            ->label('Hinweis zum Nachfüllen')
+                            ->visible(fn ($get) => filled($get('aircraft_id')))
+                            ->content(fn () => new HtmlString(
+                                '<div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">'.
+                                e($this->oilRefillInstruction()).
+                                '</div>'
+                            )),
+
                         TextInput::make('oil_level')
                             ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)
                             ->required()
@@ -160,6 +171,12 @@ class OilLogPage extends Component implements HasActions, HasForms
                             ->step(0.5),
                     ]),
             ]);
+    }
+
+    private function oilRefillInstruction(): string
+    {
+        // Static fallback for now. Can later be replaced with aircraft-specific DB data.
+        return 'Nachfüllen ab 6 Qts., jeweils 1 Qts. nachfüllen';
     }
 
     public function render()
