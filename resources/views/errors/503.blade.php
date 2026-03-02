@@ -20,7 +20,7 @@
                     <div class="absolute -inset-8 rounded-[2.5rem] bg-[#f65812]/20 blur-3xl"></div>
                     <div class="relative rounded-[2rem] border border-neutral-200/80 bg-white/80 p-6 shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
                         <img
-                            src="{{ Vite::asset('resources/images/owl/maintenance.png') }}"
+                            src="{{ Vite::asset('resources/images/owl/maintenance.webp') }}"
                             alt="Eule im Wartungsmodus"
                             class="h-80 w-80 object-contain sm:h-96 sm:w-96 lg:h-[28rem] lg:w-[28rem]"
                         >

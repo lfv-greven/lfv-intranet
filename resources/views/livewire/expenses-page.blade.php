@@ -2,7 +2,7 @@
     @if($saved)
         <div class="rounded-2xl border border-white/80 bg-white/80 p-8 text-center shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur">
             <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100">
-                <img src="{{ Vite::asset('resources/images/icons/checked.png') }}" class="h-10 w-10"/>
+                <img src="{{ Vite::asset('resources/images/icons/checked.webp') }}" class="h-10 w-10"/>
             </div>
 
             <p class="mt-6 text-lg font-semibold text-neutral-900">
