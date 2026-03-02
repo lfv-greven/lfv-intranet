@@ -114,7 +114,11 @@ class OilLogPage extends Component implements HasActions, HasForms
                                     'oil_level_type' => $aircraft->oil_level_type?->value ?? 'unknown',
                                 ]);
                             })
-                            ->options(Aircraft::owned()->pluck('registration', 'id')),
+                            ->options(
+                                Aircraft::owned()
+                                    ->where('registration', 'not like', 'X-%')
+                                    ->pluck('registration', 'id')
+                            ),
 
                         TextInput::make('oil_level')
                             ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)
