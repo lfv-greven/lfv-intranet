@@ -1,2 +1,3 @@
+# Crawl allowed so bots can read noindex headers/meta.
 User-agent: *
-Disallow: /
+Allow: /
