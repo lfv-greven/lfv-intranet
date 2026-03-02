@@ -66,9 +66,7 @@
                 <span class="text-neutral-500">Passwort</span>
                 <span class="font-semibold text-neutral-900">
                     ••••••
-                    <button wire:click="$dispatch('openModal', {component: 'chat.reset-passwort-modal'})" class="ml-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary hover:text-[#e24f12]" data-umami-event="chat_password_reset_modal_opened">
-                        zurücksetzen
-                    </button>
+                    {{ $this->resetPasswordAction }}
                 </span>
             </div>
         </div>
@@ -79,4 +77,6 @@
             zurück
         </a>
     </div>
+
+    <x-filament-actions::modals />
 </div>

@@ -86,7 +86,7 @@ pnpm dev
 - `event_enrollment_delete_success`
 - `chat_app_store_clicked`
 - `chat_google_play_clicked`
-- `chat_password_reset_modal_opened`
+- `chat_password_reset_requested`
 - `chat_back_clicked`
 
 ## Struktur

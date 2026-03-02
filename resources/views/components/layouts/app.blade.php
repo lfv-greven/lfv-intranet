@@ -50,7 +50,6 @@
 
         @livewire('notifications')
         @filamentScripts
-        @livewire('wire-elements-modal')
         @livewireScripts
     </body>
 </html>
