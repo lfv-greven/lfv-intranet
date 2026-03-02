@@ -7,7 +7,7 @@
 
     @if(auth()->user()->department_id)
         <div class="my-6 flex gap-4 items-center justify-center">
-            <img src="{{ Vite::asset('resources/images/icons/checked.png') }}" alt="Checked" class="w-12 h-12">
+            <img src="{{ Vite::asset('resources/images/icons/checked.webp') }}" alt="Checked" class="w-12 h-12">
             <span class="font-bold">Danke, dein Engagement wurde gespeichert!</span>
         </div>
     @endif

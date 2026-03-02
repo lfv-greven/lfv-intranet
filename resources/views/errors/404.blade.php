@@ -16,7 +16,7 @@
 
         <div class="rounded-[2rem] border border-neutral-200/80 bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.14)]">
             <img
-                src="{{ Vite::asset('resources/images/owl/eule-404.png') }}"
+                src="{{ Vite::asset('resources/images/owl/eule-404.webp') }}"
                 alt="Eule 404"
                 class="h-72 w-72 object-contain sm:h-80 sm:w-80"
             >

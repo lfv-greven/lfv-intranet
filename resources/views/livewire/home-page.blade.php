@@ -27,19 +27,19 @@
     @endif
 
     <div class="grid gap-4 md:grid-cols-2">
-        <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.png')" data-umami-event="home_menu_clicked" data-umami-event-target="refueling">
+        <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="refueling">
             Tanken erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.png')" data-umami-event="home_menu_clicked" data-umami-event-target="oil_log">
+        <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="oil_log">
             Ölstand erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.png')" data-umami-event="home_menu_clicked" data-umami-event-target="expenses">
+        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="expenses">
             Auslagenerstattung
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.png')" data-umami-event="home_menu_clicked" data-umami-event-target="chat">
+        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="chat">
             LfV-Chat
         </x-home.menu-link>
     </div>

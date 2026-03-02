@@ -11,7 +11,7 @@ new class extends Component
 <div class="mx-auto flex max-w-3xl flex-col gap-8 px-6 py-12 lg:py-16">
     <div class="rounded-2xl border border-white/80 bg-white/80 p-8 text-center shadow-[0_24px_80px_rgba(15,23,42,0.15)] backdrop-blur">
         <div class="flex justify-center">
-            <img src="{{ Vite::asset('resources/images/owl/check.png') }}" class="h-48 w-48" alt="Gespeichert"/>
+            <img src="{{ Vite::asset('resources/images/owl/check.webp') }}" class="h-48 w-48" alt="Gespeichert"/>
         </div>
 
         <p class="mt-6 text-lg font-semibold text-neutral-900">

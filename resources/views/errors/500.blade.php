@@ -29,7 +29,7 @@
             <div class="flex items-center justify-center">
                 <div class="relative rounded-[2rem] border border-neutral-200/80 bg-white/80 p-6 shadow-[0_30px_80px_rgba(15,23,42,0.18)]">
                     <img
-                        src="{{ Vite::asset('resources/images/owl/eule-500.png') }}"
+                        src="{{ Vite::asset('resources/images/owl/eule-500.webp') }}"
                         alt="Eule 500"
                         class="h-80 w-80 object-contain sm:h-96 sm:w-96"
                     >
