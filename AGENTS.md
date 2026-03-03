@@ -24,6 +24,8 @@
 - Blade view files use `.blade.php` under `resources/views`.
 - Format PHP with Laravel Pint: `./vendor/bin/pint`.
 - Prefer Laravel syntax and Laravel helpers wherever it is reasonable (e.g. `Str`, `Arr`, collections, `blank()` / `filled()`, `data_get()`), instead of native PHP alternatives.
+- For framework-specific patterns (Laravel, Livewire, Filament, Tailwind), default to official current-version documentation and recommended APIs.
+- Avoid custom/manual implementations when an official standard solution exists. If you intentionally deviate, document the reason and tradeoff in the PR/change summary.
 
 ## Testing Guidelines
 - Tests live in `tests/Feature` and `tests/Unit` and use PHPUnit (`phpunit.xml`).

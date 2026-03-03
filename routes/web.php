@@ -5,14 +5,13 @@ use App\Livewire\ChatSettingsPage;
 use App\Livewire\HomePage;
 use App\Livewire\LoginPage;
 use App\Livewire\OilLogPage;
-use App\Livewire\RefuelingPage;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', HomePage::class)->name('home');
-    Route::get('/tanken', RefuelingPage::class)->name('refueling');
+    Route::livewire('/tanken', 'refueling-page')->name('refueling');
     Route::livewire('/tanken-gespeichert', 'refueling-success-page')->name('refueling.success');
     Route::get('/oil', OilLogPage::class)->name('oil');
     Route::livewire('/oil-gespeichert', 'oil-log-success-page')->name('oil.success');

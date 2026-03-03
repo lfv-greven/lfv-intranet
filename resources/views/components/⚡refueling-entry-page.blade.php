@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Livewire;
-
 use App\Enums\RefuelingType;
 use App\Models\Aircraft;
 use App\Models\GasStation;
@@ -16,13 +14,11 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
-use Throwable;
 
-class RefuelingPage extends Component implements HasActions, HasForms
+new class extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
@@ -71,7 +67,7 @@ class RefuelingPage extends Component implements HasActions, HasForms
                 'amount' => $data->amount,
                 'comment' => $data->comment,
             ]);
-        } catch (Throwable $exception) {
+        } catch (\Throwable $exception) {
             $this->dispatch('umami-track', name: 'refueling_submit_error', data: [
                 'error_type' => 'save_failure',
             ]);
@@ -163,7 +159,7 @@ class RefuelingPage extends Component implements HasActions, HasForms
                             ->minValue(0)
                             ->numeric()
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, $set, $get, $operation) {
+                            ->afterStateUpdated(function ($state, $set, $get) {
                                 $gasStationId = $get('gas_station_id');
                                 if (! $gasStationId) {
                                     return;
@@ -190,21 +186,15 @@ class RefuelingPage extends Component implements HasActions, HasForms
                     ]),
             ]);
     }
+};
+?>
 
-    public function render()
-    {
-        return view('livewire.refueling-page', [
-            'myRefuelings' => $this->getMyRefuelings(),
-        ]);
-    }
+<form class="grid gap-6" wire:submit.prevent="save" x-data x-on:focusin.once="window.trackUmamiEvent('refueling_start')">
+    {{ $this->form }}
 
-    protected function getMyRefuelings(): Collection
-    {
-        return Refueling::query()
-            ->with(['gasStation', 'aircraft'])
-            ->where('user_id', auth()->id())
-            ->orderByDesc('date')
-            ->limit(50)
-            ->get();
-    }
-}
+    <div class="pt-2">
+        <x-filament::button type="submit" class="w-full">
+            Betankung speichern
+        </x-filament::button>
+    </div>
+</form>
