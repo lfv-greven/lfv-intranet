@@ -261,10 +261,15 @@ class RefuelingsTable
                                 'Typ',
                                 'Zählerstand',
                                 'Menge',
+                                'Abrechnungsstatus',
                                 'Kommentar',
                             ], ';');
 
                             foreach ($query->lazy() as $record) {
+                                $billingStatus = ! $record->mayBeSold()
+                                    ? 'Nicht erforderlich'
+                                    : ($record->isExported() ? 'Abgerechnet' : 'Offen');
+
                                 fputcsv($output, [
                                     $record->date?->format('d.m.Y H:i'),
                                     $record->buyer_registration,
@@ -276,6 +281,7 @@ class RefuelingsTable
                                     },
                                     $record->counter_reading,
                                     $record->amount,
+                                    $billingStatus,
                                     $record->comment,
                                 ], ';');
                             }
