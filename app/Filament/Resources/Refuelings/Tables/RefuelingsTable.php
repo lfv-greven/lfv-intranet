@@ -12,6 +12,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -179,6 +181,62 @@ class RefuelingsTable
                             ->title('Verkauf wird im Hintergrund übertragen.')
                             ->send();
                     }),
+                Action::make('fill_to_capacity')
+                    ->icon('heroicon-o-truck')
+                    ->iconButton()
+                    ->tooltip('Lieferung nach dieser Zeile einfügen')
+                    ->visible(fn (Refueling $record) => filled($record->gasStation?->capacity))
+                    ->fillForm(function (Refueling $record): array {
+                        return [
+                            'amount' => static::getAmountToFullAtRecord($record),
+                            'date' => now(),
+                        ];
+                    })
+                    ->schema([
+                        DateTimePicker::make('date')
+                            ->label('Datum')
+                            ->seconds(false)
+                            ->required()
+                            ->default(now()),
+                        TextInput::make('amount')
+                            ->label('Auffüllen auf Füllstand X Liter')
+                            ->helperText(function (Refueling $record): string {
+                                $capacity = (int) $record->gasStation->capacity;
+                                $suggested = static::getAmountToFullAtRecord($record);
+
+                                return "Vorschlag bis voll ({$capacity} l): {$suggested} l";
+                            })
+                            ->numeric()
+                            ->required()
+                            ->minValue(0)
+                            ->suffix(' l'),
+                    ])
+                    ->modalHeading('Lieferung erfassen')
+                    ->modalSubmitActionLabel('Lieferung speichern')
+                    ->action(function (Refueling $record, array $data): void {
+                        $amount = (int) round((float) $data['amount']);
+                        $date = filled($data['date'] ?? null)
+                            ? Carbon::parse($data['date'])
+                            : now();
+
+                        Refueling::create([
+                            'user_id' => auth()->id(),
+                            'type' => RefuelingType::filling,
+                            'gas_station_id' => $record->gas_station_id,
+                            'date' => $date,
+                            'aircraft_id' => null,
+                            'buyer_name' => auth()->user()->name,
+                            'buyer_registration' => null,
+                            'counter_reading' => $record->counter_reading,
+                            'amount' => $amount,
+                            'comment' => 'Lieferung aus Zeilenaktion',
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Lieferung gespeichert')
+                            ->send();
+                    }),
                 EditAction::make()->iconButton(),
                 DeleteAction::make()->iconButton(),
             ])
@@ -270,5 +328,28 @@ class RefuelingsTable
         $hasRegistrationFilter = filled(data_get($livewire, 'tableFilters.buyer_registration.value'));
 
         return $hasSearch || $hasRegistrationFilter;
+    }
+
+    protected static function getAmountToFullAtRecord(Refueling $record): int
+    {
+        $capacity = (int) ($record->gasStation?->capacity ?? 0);
+        if ($capacity <= 0) {
+            return 0;
+        }
+
+        $fillLevelAtRecord = (int) Refueling::query()
+            ->where('gas_station_id', $record->gas_station_id)
+            ->where(function (Builder $query) use ($record): void {
+                $query
+                    ->where('counter_reading', '<', $record->counter_reading)
+                    ->orWhere(function (Builder $query) use ($record): void {
+                        $query
+                            ->where('counter_reading', $record->counter_reading)
+                            ->where('id', '<=', $record->id);
+                    });
+            })
+            ->sum('amount');
+
+        return max(0, $capacity - $fillLevelAtRecord);
     }
 }
