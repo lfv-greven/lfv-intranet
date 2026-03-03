@@ -16,6 +16,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
@@ -192,6 +193,18 @@ class RefuelingPage extends Component implements HasActions, HasForms
 
     public function render()
     {
-        return view('livewire.refueling-page');
+        return view('livewire.refueling-page', [
+            'myRefuelings' => $this->getMyRefuelings(),
+        ]);
+    }
+
+    protected function getMyRefuelings(): Collection
+    {
+        return Refueling::query()
+            ->with(['gasStation', 'aircraft'])
+            ->where('user_id', auth()->id())
+            ->orderByDesc('date')
+            ->limit(50)
+            ->get();
     }
 }

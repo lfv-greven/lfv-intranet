@@ -28,7 +28,7 @@
 
     <div class="grid gap-4 md:grid-cols-2">
         <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="refueling">
-            Tanken erfassen
+            Tankstelle
         </x-home.menu-link>
 
         <x-home.menu-link :href="route('oil')" :icon_url="Vite::asset('resources/images/icons/barrel.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="oil_log">
