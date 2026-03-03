@@ -182,6 +182,52 @@ class RefuelingsTable
                 EditAction::make()->iconButton(),
                 DeleteAction::make()->iconButton(),
             ])
+            ->headerActions([
+                Action::make('csv_export')
+                    ->label('CSV Export')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->action(function ($livewire) {
+                        $query = $livewire->getFilteredSortedTableQuery();
+
+                        return response()->streamDownload(function () use ($query) {
+                            $output = fopen('php://output', 'w');
+
+                            // UTF-8 BOM for Excel compatibility.
+                            fwrite($output, "\xEF\xBB\xBF");
+
+                            fputcsv($output, [
+                                'Datum',
+                                'Kennzeichen',
+                                'Name',
+                                'Typ',
+                                'Zählerstand',
+                                'Menge',
+                                'Kommentar',
+                            ], ';');
+
+                            foreach ($query->lazy() as $record) {
+                                fputcsv($output, [
+                                    $record->date?->format('d.m.Y H:i'),
+                                    $record->buyer_registration,
+                                    $record->buyer_name,
+                                    match (data_get($record, 'type')) {
+                                        RefuelingType::refueling, 'refueling' => 'Tanken',
+                                        RefuelingType::filling, 'filling' => 'Lieferung',
+                                        default => '',
+                                    },
+                                    $record->counter_reading,
+                                    $record->amount,
+                                    $record->comment,
+                                ], ';');
+                            }
+
+                            fclose($output);
+                        }, 'betankungen-'.now()->format('Ymd-His').'.csv', [
+                            'Content-Type' => 'text/csv; charset=UTF-8',
+                        ]);
+                    }),
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     BulkAction::make('send_vf_bulk')
