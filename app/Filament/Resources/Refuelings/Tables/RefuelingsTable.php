@@ -5,15 +5,22 @@ namespace App\Filament\Resources\Refuelings\Tables;
 use App\Enums\RefuelingType;
 use App\Jobs\Vf\SendRefueling;
 use App\Models\Refueling;
+use Carbon\Carbon;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\Indicator;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class RefuelingsTable
@@ -26,18 +33,21 @@ class RefuelingsTable
                 ->orderByDesc('date')
                 ->orderByDesc('id')
             )
-            ->modifyQueryUsing(function ($query) {
-                return $query
+            ->modifyQueryUsing(function ($query, $livewire) {
+                $query = $query
                     ->with(['aircraft', 'gasStation'])
-                    ->select('refuelings.*')
-                    ->addSelect(DB::raw('
+                    ->select('refuelings.*');
+
+                if (! static::shouldHideWindowColumnsFor($livewire)) {
+                    return $query
+                        ->addSelect(DB::raw('
         SUM(amount) OVER (
           PARTITION BY gas_station_id
           ORDER BY counter_reading, id
           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS fill_level
     '))
-                    ->addSelect(DB::raw("
+                        ->addSelect(DB::raw("
         CASE
           WHEN type = 'filling' THEN NULL
           ELSE LAG(counter_reading) OVER (
@@ -46,6 +56,9 @@ class RefuelingsTable
                ) - counter_reading - amount
         END AS diff
     "));
+                }
+
+                return $query;
             })
             ->selectCurrentPageOnly()
             ->checkIfRecordIsSelectableUsing(fn (Refueling $record) => ! $record->isExported() && $record->mayBeSold())
@@ -56,9 +69,11 @@ class RefuelingsTable
                 TextColumn::make('buyer_registration')
                     ->badge(fn ($record) => filled($record->aircraft_id))
                     ->color('gray')
-                    ->label('Kennzeichen'),
+                    ->label('Kennzeichen')
+                    ->searchable(),
                 TextColumn::make('buyer_name')
-                    ->label('Name'),
+                    ->label('Name')
+                    ->searchable(),
                 TextColumn::make('counter_reading')
                     ->numeric(0, null, '.')
                     ->alignRight()
@@ -67,13 +82,15 @@ class RefuelingsTable
                     ->numeric(0, null, '.')
                     ->color(fn ($state) => $state < 0 ? 'danger' : null)
                     ->alignRight()
-                    ->label('Diff'),
+                    ->label('Diff')
+                    ->hidden(fn (HasTable $livewire): bool => static::shouldHideWindowColumnsFor($livewire)),
                 TextColumn::make('fill_level')
                     ->label('Füllstand')
                     ->numeric(0, null, '.')
                     ->suffix(' l')
                     ->alignRight()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->hidden(fn (HasTable $livewire): bool => static::shouldHideWindowColumnsFor($livewire)),
                 TextColumn::make('amount')
                     ->label('Menge')
                     ->alignRight()
@@ -88,6 +105,52 @@ class RefuelingsTable
                     ->label('')
                     ->tooltip(fn ($state) => 'Kommentar des Piloten: '.$state)
                     ->icon('heroicon-s-chat-bubble-oval-left-ellipsis'),
+            ])
+            ->filters([
+                Filter::make('date_range')
+                    ->label('Zeitraum')
+                    ->schema([
+                        DatePicker::make('from')
+                            ->label('Von'),
+                        DatePicker::make('until')
+                            ->label('Bis'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                filled($data['from'] ?? null),
+                                fn (Builder $query): Builder => $query->whereDate('refuelings.date', '>=', $data['from']),
+                            )
+                            ->when(
+                                filled($data['until'] ?? null),
+                                fn (Builder $query): Builder => $query->whereDate('refuelings.date', '<=', $data['until']),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if (filled($data['from'] ?? null)) {
+                            $indicators[] = Indicator::make('Von '.Carbon::parse($data['from'])->format('d.m.Y'))
+                                ->removeField('from');
+                        }
+
+                        if (filled($data['until'] ?? null)) {
+                            $indicators[] = Indicator::make('Bis '.Carbon::parse($data['until'])->format('d.m.Y'))
+                                ->removeField('until');
+                        }
+
+                        return $indicators;
+                    }),
+                SelectFilter::make('buyer_registration')
+                    ->label('Kennzeichen')
+                    ->options(fn (): array => Refueling::query()
+                        ->whereNotNull('buyer_registration')
+                        ->where('buyer_registration', '!=', '')
+                        ->distinct()
+                        ->orderBy('buyer_registration')
+                        ->pluck('buyer_registration', 'buyer_registration')
+                        ->all())
+                    ->searchable(),
             ])
             ->recordActions([
                 Action::make('send_vf')
@@ -149,5 +212,17 @@ class RefuelingsTable
                 ]),
             ])
             ->paginationPageOptions([50, 100, 250]);
+    }
+
+    protected static function shouldHideWindowColumnsFor(mixed $livewire): bool
+    {
+        if (! is_object($livewire)) {
+            return false;
+        }
+
+        $hasSearch = filled(data_get($livewire, 'tableSearch'));
+        $hasRegistrationFilter = filled(data_get($livewire, 'tableFilters.buyer_registration.value'));
+
+        return $hasSearch || $hasRegistrationFilter;
     }
 }
