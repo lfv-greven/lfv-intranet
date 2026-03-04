@@ -1,6 +1,6 @@
 Hallo {{ $name }},
 
-für dich wurde ein Konto im offiziellen LfV Chat eingerichtet, den die Luftfahrtvereinigung Greven e. V. mit Serverstandort in Deutschland betreibt.
+für dich wurde ein Konto im offiziellen LfV Chat eingerichtet, den die Luftfahrtvereinigung Greven e. V.  betreibt.
 Bitte befolge die Schritte, um den Chat zu installieren.
 
 
