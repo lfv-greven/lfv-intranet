@@ -50,6 +50,7 @@ class GasStationResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->withCurrentFilling())
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('fuel_type')
@@ -60,11 +61,10 @@ class GasStationResource extends Resource
                     ->label('Tank-Kapazität')
                     ->numeric()
                     ->suffix(' l'),
-                TextColumn::make('refuelings_sum_amount')
+                TextColumn::make('current_filling')
                     ->label('Aktueller Füllstand')
                     ->alignRight()
                     ->numeric()
-                    ->sum('refuelings', 'amount')
                     ->suffix(' l'),
             ])
             ->filters([

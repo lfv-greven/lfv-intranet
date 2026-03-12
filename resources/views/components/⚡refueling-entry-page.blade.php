@@ -110,11 +110,11 @@ new class extends Component implements HasActions, HasForms
                                     return;
                                 }
 
-                                $filling = GasStation::withSum('refuelings', 'amount')
-                                    ->find($state)
-                                    ->refuelings_sum_amount;
+                                $filling = GasStation::query()
+                                    ->withCurrentFilling()
+                                    ->find($state)?->current_filling;
 
-                                if ($filling) {
+                                if (filled($filling)) {
                                     return 'Aktueller Füllstand: '.Number::format($filling, locale: 'de').' L';
                                 }
                             })

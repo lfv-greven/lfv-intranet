@@ -43,11 +43,11 @@ class RefuelingsTable
                 if (! static::shouldHideWindowColumnsFor($livewire)) {
                     return $query
                         ->addSelect(DB::raw('
-        SUM(amount) OVER (
+        GREATEST(0, SUM(amount) OVER (
           PARTITION BY gas_station_id
           ORDER BY counter_reading, id
           ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS fill_level
+        )) AS fill_level
     '))
                         ->addSelect(DB::raw("
         CASE
@@ -343,7 +343,7 @@ class RefuelingsTable
             return 0;
         }
 
-        $fillLevelAtRecord = (int) Refueling::query()
+        $fillLevelAtRecord = max(0, (int) Refueling::query()
             ->where('gas_station_id', $record->gas_station_id)
             ->where(function (Builder $query) use ($record): void {
                 $query
@@ -354,7 +354,7 @@ class RefuelingsTable
                             ->where('id', '<=', $record->id);
                     });
             })
-            ->sum('amount');
+            ->sum('amount'));
 
         return max(0, $capacity - $fillLevelAtRecord);
     }

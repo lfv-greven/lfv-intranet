@@ -31,6 +31,19 @@ class GasStation extends Model
         return $this->hasMany(Refueling::class);
     }
 
+    public function scopeWithCurrentFilling($query)
+    {
+        return $query->withSum('refuelings as current_filling_amount', 'amount');
+    }
+
+    public function getCurrentFillingAttribute(): int
+    {
+        $filling = $this->getAttributeFromArray('current_filling_amount')
+            ?? $this->refuelings()->sum('amount');
+
+        return max(0, (int) round($filling));
+    }
+
     public function getCurrentCounterReading(): int
     {
         return $this->refuelings()->orderByDesc('date')->first()?->counter_reading ?? 0;

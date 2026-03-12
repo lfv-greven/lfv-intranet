@@ -22,9 +22,9 @@ class DashboardStats extends BaseWidget
             ->count();
 
         return [
-            ...GasStation::all()->map(fn (GasStation $gasStation) => Stat::make(
+            ...GasStation::query()->withCurrentFilling()->get()->map(fn (GasStation $gasStation) => Stat::make(
                 $gasStation->name,
-                $gasStation->refuelings()->sum('amount').' l',
+                $gasStation->current_filling.' l',
             )
                 ->description('Letzte 7 Tage: '.abs($gasStation->refuelings()->refueling()->where('date', '>', today()->subDays(7))->sum('amount')).' l')
             ),
