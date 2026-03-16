@@ -343,7 +343,7 @@ class RefuelingsTable
             return 0;
         }
 
-        $fillLevelAtRecord = max(0, (int) Refueling::query()
+        $fillLevelAtRecord = (int) Refueling::query()
             ->where('gas_station_id', $record->gas_station_id)
             ->where(function (Builder $query) use ($record): void {
                 $query
@@ -354,7 +354,7 @@ class RefuelingsTable
                             ->where('id', '<=', $record->id);
                     });
             })
-            ->sum('amount'));
+            ->sum('amount');
 
         return max(0, $capacity - $fillLevelAtRecord);
     }
