@@ -1,21 +1,26 @@
 # LfV Intranet
 
-Das LfV Intranet ist die interne Plattform der Luftfahrtvereinigung Greven e.V. für Mitglieder‑Workflows (z. B. Tanken, Ölstand, Auslagenerstattung, Chat) und Admin‑Prozesse.
+LfV Intranet is the internal platform of Luftfahrtvereinigung Greven e.V. for member-facing workflows and internal administration.
+
+It covers recurring club processes such as refueling, oil logging, expense submissions, department coordination, chat onboarding, and administrative back-office tasks.
 
 ## Features
-- Mitglieder‑Login über Vereinsflieger
-- Mobile‑optimierte Eingabeformulare für operative Abläufe
-- Filament Admin für interne Prozesse
-- Hintergrundjobs (Queue) für Integrationen
+
+- Member login via Vereinsflieger
+- Mobile-optimized forms for operational workflows
+- Filament admin panel for internal processes
+- Background jobs and queue-based integrations
 
 ## Tech Stack
+
 - Laravel 12
 - Livewire 4
 - Filament 5
 - Tailwind CSS 4
 - MySQL
 
-## Setup (lokal)
+## Local Setup
+
 ```bash
 composer install
 pnpm install
@@ -25,22 +30,28 @@ php artisan migrate
 pnpm dev
 ```
 
-## Wichtige Umgebungsvariablen
-- `VF_USERNAME`, `VF_PASSWORD`, `VF_APPKEY`, `VF_CID` – Vereinsflieger Zugang
-- `FI_WORKHOURS_CATEGORY_ID` – Kategorie‑ID für Workhours (Standard: `8471`)
+## Important Environment Variables
+
+- `VF_USERNAME`, `VF_PASSWORD`, `VF_APPKEY`, `VF_CID`: Vereinsflieger credentials
+- `FI_WORKHOURS_CATEGORY_ID`: workhours category id used for FI workflows (default: `8471`)
 
 ## Development
-- Start Backend: `php artisan serve`
-- Start Frontend: `pnpm dev`
-- Tests: `php artisan test`
+
+- Start the backend: `php artisan serve`
+- Start the frontend: `pnpm dev`
+- Run tests: `php artisan test`
+- Run code style fixes: `./vendor/bin/pint`
+- Build production assets: `pnpm build`
 
 ## Umami Event Tracking
-- Das Umami-Script wird nur in `production` eingebunden (`resources/views/components/layouts/app.blade.php`).
-- Statische Klick-Events nutzen `data-umami-event` direkt in Blade.
-- Dynamische Events nutzen `window.trackUmamiEvent(name, data)` aus `resources/js/app.js`.
-- Livewire sendet dafür Browser-Events über `$this->dispatch('umami-track', ...)`.
 
-### Verwendete Event-Namen
+- The Umami script is only loaded in `production` from [app.blade.php](/Users/oliver/Entwicklung/lfv-intranet/resources/views/components/layouts/app.blade.php).
+- Static click tracking uses `data-umami-event` directly in Blade templates.
+- Dynamic tracking uses `window.trackUmamiEvent(name, data)` from [app.js](/Users/oliver/Entwicklung/lfv-intranet/resources/js/app.js).
+- Livewire dispatches browser events through `$this->dispatch('umami-track', ...)`.
+
+### Event Names In Use
+
 - `header_logo_clicked`
 - `admin_link_clicked`
 - `home_event_banner_clicked`
@@ -90,16 +101,35 @@ pnpm dev
 - `chat_password_reset_requested`
 - `chat_back_clicked`
 
-## Struktur
-- `app/` – Laravel Anwendung (Models, Jobs, Services)
-- `resources/` – Views, CSS, JS, Assets
-- `routes/` – HTTP Routen
-- `database/` – Migrations
-- `tests/` – Tests
+## Project Structure
 
-## Hinweise
-- Keine Secrets committen.
-- Datenzugriff auf Vereinsflieger erfolgt über `App\Services\VereinsfliegerClient` (frischer Login + Retry).
+- `app/`: Laravel application code such as models, jobs, and services
+- `resources/`: Blade views, CSS, JavaScript, and static assets
+- `routes/`: HTTP route definitions
+- `database/`: migrations, factories, and seeders
+- `tests/`: automated tests
 
-## Lizenz
-Proprietär – nur für interne Nutzung der LfV Greven e.V.
+## Notes
+
+- Do not commit secrets.
+- Access to Vereinsflieger should go through `App\Services\VereinsfliegerClient` to keep login and retry behavior consistent.
+
+## Contributing
+
+Contributions are welcome.
+
+Please read [CONTRIBUTING.md](/Users/oliver/Entwicklung/lfv-intranet/CONTRIBUTING.md) before opening your first pull request.
+
+By submitting a contribution, you confirm that you have the necessary rights to your changes and that you provide them under `AGPL-3.0-or-later`.
+
+## Security
+
+Please do not report vulnerabilities in public issues.
+
+See [SECURITY.md](/Users/oliver/Entwicklung/lfv-intranet/SECURITY.md) for the reporting process.
+
+## License
+
+This project is licensed under the `GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later)`.
+
+See [LICENSE](/Users/oliver/Entwicklung/lfv-intranet/LICENSE) for the full license text.
