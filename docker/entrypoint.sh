@@ -3,8 +3,13 @@ set -eu
 
 cd /var/www/html
 
-mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
-chown -R www-data:www-data storage bootstrap/cache
+ensure_runtime_permissions() {
+    mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
+    chown -R www-data:www-data storage bootstrap/cache
+    chmod -R ug+rwX storage bootstrap/cache
+}
+
+ensure_runtime_permissions
 
 envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf
 
@@ -21,5 +26,7 @@ if [ "${APP_ENV:-production}" = "production" ]; then
     php artisan route:cache || true
     php artisan view:cache || true
 fi
+
+ensure_runtime_permissions
 
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
