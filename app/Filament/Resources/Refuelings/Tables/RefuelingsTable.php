@@ -229,7 +229,6 @@ class RefuelingsTable
                             'buyer_registration' => null,
                             'counter_reading' => $record->counter_reading,
                             'amount' => $amount,
-                            'comment' => 'Lieferung aus Zeilenaktion',
                         ]);
 
                         Notification::make()
