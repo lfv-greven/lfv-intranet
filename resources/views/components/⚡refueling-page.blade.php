@@ -39,6 +39,14 @@ new class extends Component
                 >
                     Meine Tankvorgänge
                 </button>
+                <button
+                    type="button"
+                    class="rounded-xl px-4 py-2 text-sm font-semibold transition"
+                    :class="$wire.tab === 'prices' ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'"
+                    wire:click="$set('tab', 'prices')"
+                >
+                    Preise
+                </button>
             </div>
         </div>
 
@@ -49,6 +57,12 @@ new class extends Component
         <template x-if="$wire.tab === 'history'">
             <div x-cloak>
                 <livewire:refueling-history-page />
+            </div>
+        </template>
+
+        <template x-if="$wire.tab === 'prices'">
+            <div x-cloak>
+                <livewire:refueling-prices-page />
             </div>
         </template>
     </div>

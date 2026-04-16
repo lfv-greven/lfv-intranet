@@ -18,11 +18,7 @@ new class extends Component
 };
 ?>
 
-<div class="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-    <div class="border-b border-neutral-200 px-5 py-4">
-        <h2 class="text-base font-semibold text-neutral-900">Meine letzten Einträge</h2>
-    </div>
-
+<x-ui.refueling-card title="Meine letzten Einträge">
     @if ($this->myRefuelings->isEmpty())
         <div class="px-5 py-10 text-sm text-neutral-500">
             Du hast bisher noch keine Tankvorgänge erfasst.
@@ -71,4 +67,4 @@ new class extends Component
             </table>
         </div>
     @endif
-</div>
+</x-ui.refueling-card>
