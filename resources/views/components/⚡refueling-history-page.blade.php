@@ -18,7 +18,7 @@ new class extends Component
 };
 ?>
 
-<x-ui.refueling-card title="Meine letzten Einträge">
+<x-ui.card title="Meine letzten Einträge">
     @if ($this->myRefuelings->isEmpty())
         <div class="px-5 py-10 text-sm text-neutral-500">
             Du hast bisher noch keine Tankvorgänge erfasst.
@@ -67,4 +67,4 @@ new class extends Component
             </table>
         </div>
     @endif
-</x-ui.refueling-card>
+</x-ui.card>

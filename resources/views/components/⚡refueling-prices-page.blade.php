@@ -21,7 +21,7 @@ new class extends Component
 ?>
 
 <div class="space-y-3">
-    <x-ui.refueling-card title="Aktuelle Preise">
+    <x-ui.card title="Aktuelle Preise">
         <div class="bg-[#fffaf4] px-5 py-5 sm:px-6 sm:py-6">
             @forelse ($this->priceBoardEntries as $entry)
                 <div class="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 border-b border-primary/15 py-4 first:pt-0 last:border-b-0 last:pb-0 sm:py-5">
@@ -47,7 +47,7 @@ new class extends Component
                 </div>
             @endforelse
         </div>
-    </x-ui.refueling-card>
+    </x-ui.card>
 
     <div class="text-right text-[11px] text-neutral-500 sm:text-xs">
         Stand {{ $this->priceBoardStand }}
