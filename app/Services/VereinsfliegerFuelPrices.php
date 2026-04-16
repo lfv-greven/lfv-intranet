@@ -12,7 +12,7 @@ class VereinsfliegerFuelPrices
     private const FAILURE_CACHE_MINUTES = 10;
 
     /**
-     * @return array<int, array{fuel: string, amount: string}>
+     * @return array<int, array{fuel: string, amount: string, vat_rate: string|null}>
      */
     public function getCurrentPriceBoardEntries(): array
     {
@@ -29,14 +29,15 @@ class VereinsfliegerFuelPrices
                     return null;
                 }
 
-                $unitPrice = $this->findCurrentUnitPrice(data_get($article, 'prices', []));
-                if ($unitPrice === null) {
+                $price = $this->findCurrentPrice(data_get($article, 'prices', []));
+                if ($price === null) {
                     return null;
                 }
 
                 return [
                     'fuel' => $station->name,
-                    'amount' => number_format($unitPrice, 2, ',', ''),
+                    'amount' => number_format($price['unit_price'], 2, ',', ''),
+                    'vat_rate' => $price['sales_tax'],
                 ];
             })
             ->filter()
@@ -103,7 +104,10 @@ class VereinsfliegerFuelPrices
         return $articlesById;
     }
 
-    private function findCurrentUnitPrice(mixed $prices): ?float
+    /**
+     * @return array{unit_price: float, sales_tax: string|null}|null
+     */
+    private function findCurrentPrice(mixed $prices): ?array
     {
         if (! is_array($prices)) {
             return null;
@@ -121,10 +125,13 @@ class VereinsfliegerFuelPrices
                     return null;
                 }
 
+                $salesTax = $this->normalizeSalesTax(data_get($price, 'salestax'));
+
                 return [
                     'valid_from' => $validFrom,
                     'valid_to' => $validTo,
                     'unit_price' => (float) $unitPrice,
+                    'sales_tax' => $salesTax,
                 ];
             })
             ->filter();
@@ -135,14 +142,24 @@ class VereinsfliegerFuelPrices
             ->first();
 
         if (is_array($activePrice)) {
-            return $activePrice['unit_price'];
+            return [
+                'unit_price' => $activePrice['unit_price'],
+                'sales_tax' => $activePrice['sales_tax'],
+            ];
         }
 
         $latestPrice = $current
             ->sortByDesc(fn (array $price) => $price['valid_from']->timestamp)
             ->first();
 
-        return is_array($latestPrice) ? $latestPrice['unit_price'] : null;
+        if (! is_array($latestPrice)) {
+            return null;
+        }
+
+        return [
+            'unit_price' => $latestPrice['unit_price'],
+            'sales_tax' => $latestPrice['sales_tax'],
+        ];
     }
 
     private function parseDate(mixed $value): ?CarbonImmutable
@@ -156,6 +173,17 @@ class VereinsfliegerFuelPrices
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    private function normalizeSalesTax(mixed $value): ?string
+    {
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $normalized = rtrim(rtrim(number_format((float) $value, 2, '.', ''), '0'), '.');
+
+        return str_replace('.', ',', $normalized);
     }
 
     private function isValidCachedArticleMap(mixed $cached): bool
