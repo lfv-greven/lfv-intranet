@@ -54,7 +54,7 @@ RUN --mount=type=cache,target=/tmp/composer-cache \
     --optimize-autoloader \
     --no-scripts
 
-FROM node:25-alpine AS assets
+FROM node:26-alpine AS assets
 WORKDIR /app
 
 COPY package.json package-lock.json ./
