@@ -212,8 +212,7 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
                         ->subject("[Dringend] Dein Flug wurde falsch erfasst (#$flightId)")
                         ->priority(Email::PRIORITY_HIGHEST)
                         ->to($mails)
-                        ->bcc('fabio.plogmann@sportflugzentrum.de')
-                        ->replyTo('fabio.plogmann@sportflugzentrum.de');
+                        ->replyTo('info@sportflugzentrum.de');
                 });
 
                 // Log sent mail
