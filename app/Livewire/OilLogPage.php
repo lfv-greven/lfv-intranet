@@ -61,7 +61,7 @@ class OilLogPage extends Component implements HasActions, HasForms
             $aircraft = Aircraft::findOrFail($data['aircraft_id']);
             $aircraft->oilLogs()->create([
                 'user_id' => auth()->id(),
-                'pilot' => auth()->user()->name,
+                'pilot' => auth()->user()?->name ?? $data['pilot'],
                 'registration' => $aircraft->registration,
                 'oil_level' => $data['oil_level'],
                 'oil_refilled' => $data['oil_refilled'],
@@ -112,6 +112,12 @@ class OilLogPage extends Component implements HasActions, HasForms
                                     ->where('registration', 'not like', 'X-%')
                                     ->pluck('registration', 'id')
                             ),
+
+                        TextInput::make('pilot')
+                            ->visible(fn () => auth()->guest())
+                            ->required(fn () => auth()->guest())
+                            ->label('Name')
+                            ->placeholder('Vor- und Nachname'),
 
                         TextInput::make('oil_level')
                             ->visible(fn () => $this->oilLevelType == OilLevelType::absolute)

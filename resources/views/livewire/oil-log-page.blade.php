@@ -18,9 +18,11 @@
         </div>
     </form>
 
-    <div class="text-left">
-        <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="oil_log_back_clicked">
-            zurück
-        </a>
-    </div>
+    @auth
+        <div class="text-left">
+            <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="oil_log_back_clicked">
+                zurück
+            </a>
+        </div>
+    @endauth
 </div>

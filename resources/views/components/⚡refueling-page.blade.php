@@ -7,6 +7,13 @@ new class extends Component
 {
     #[Url(as: 'tab', except: 'create', history: true)]
     public string $tab = 'create';
+
+    public function mount(): void
+    {
+        if (auth()->guest() && $this->tab === 'history') {
+            $this->tab = 'create';
+        }
+    }
 };
 ?>
 
@@ -39,14 +46,16 @@ new class extends Component
                 >
                     Preise
                 </button>
-                <button
-                    type="button"
-                    class="rounded-xl px-4 py-2 text-sm font-semibold transition"
-                    :class="$wire.tab === 'history' ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'"
-                    wire:click="$set('tab', 'history')"
-                >
-                    Meine Tankvorgänge
-                </button>
+                @auth
+                    <button
+                        type="button"
+                        class="rounded-xl px-4 py-2 text-sm font-semibold transition"
+                        :class="$wire.tab === 'history' ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-600 hover:text-neutral-900'"
+                        wire:click="$set('tab', 'history')"
+                    >
+                        Meine Tankvorgänge
+                    </button>
+                @endauth
             </div>
         </div>
 
@@ -60,16 +69,20 @@ new class extends Component
             </div>
         </template>
 
-        <template x-if="$wire.tab === 'history'">
-            <div x-cloak>
-                <livewire:refueling-history-page />
-            </div>
-        </template>
+        @auth
+            <template x-if="$wire.tab === 'history'">
+                <div x-cloak>
+                    <livewire:refueling-history-page />
+                </div>
+            </template>
+        @endauth
     </div>
 
-    <div class="text-left">
-        <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="refueling_back_clicked">
-            zurück
-        </a>
-    </div>
+    @auth
+        <div class="text-left">
+            <a href="{{ route('home') }}" class="link" wire:navigate data-umami-event="refueling_back_clicked">
+                zurück
+            </a>
+        </div>
+    @endauth
 </div>

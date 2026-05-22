@@ -23,9 +23,15 @@ new class extends Component
         </p>
 
         <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <x-filament::button tag="a" :href="route('home')" class="w-full sm:w-auto" data-umami-event="refueling_success_home_clicked">
-                Zur Startseite
-            </x-filament::button>
+            @auth
+                <x-filament::button tag="a" :href="route('home')" class="w-full sm:w-auto" data-umami-event="refueling_success_home_clicked">
+                    Zur Startseite
+                </x-filament::button>
+            @else
+                <x-filament::button tag="a" :href="route('refueling')" class="w-full sm:w-auto">
+                    Weiteren Tankvorgang erfassen
+                </x-filament::button>
+            @endauth
         </div>
     </div>
 </div>

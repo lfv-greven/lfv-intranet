@@ -18,6 +18,8 @@ return [
         'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
     ],
 
+    'login_required' => env('LOGIN_REQUIRED', true),
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Guards

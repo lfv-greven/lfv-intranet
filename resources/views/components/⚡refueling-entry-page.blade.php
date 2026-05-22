@@ -30,6 +30,7 @@ new class extends Component implements HasActions, HasForms
         $this->form->fill([
             'gas_station_id' => null,
             'aircraft_id' => null,
+            'buyer_name' => null,
             'buyer_registration' => null,
             'counter_reading' => null,
             'amount' => null,
@@ -61,7 +62,7 @@ new class extends Component implements HasActions, HasForms
                 'gas_station_id' => $data->gas_station_id,
                 'date' => now(),
                 'aircraft_id' => $data->aircraft_id,
-                'buyer_name' => auth()->user()->name,
+                'buyer_name' => auth()->user()?->name ?? $data->buyer_name,
                 'buyer_registration' => $reg,
                 'counter_reading' => $data->counter_reading,
                 'amount' => $data->amount,
@@ -147,6 +148,12 @@ new class extends Component implements HasActions, HasForms
                             ->label('Kennzeichen')
                             ->placeholder('D-EABC')
                             ->required(),
+
+                        TextInput::make('buyer_name')
+                            ->visible(fn () => auth()->guest())
+                            ->required(fn () => auth()->guest())
+                            ->label('Name')
+                            ->placeholder('Vor- und Nachname'),
                     ]),
 
                 Section::make('Betankung erfassen')
