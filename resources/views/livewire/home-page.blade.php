@@ -15,6 +15,7 @@
         </p>
     </div>
 
+    @auth
     @if($event)
         <a href="{{ route('event', ['event' => $event->id]) }}"
            data-umami-event="home_event_banner_clicked"
@@ -25,6 +26,7 @@
             <div class="mt-2 text-sm text-emerald-700">Jetzt Platz sichern</div>
         </a>
     @endif
+    @endauth
 
     <div class="grid gap-4 md:grid-cols-2">
         <x-home.menu-link :href="route('refueling')" :icon_url="Vite::asset('resources/images/icons/gas-pump.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="refueling">
@@ -35,13 +37,15 @@
             Ölstand erfassen
         </x-home.menu-link>
 
-        <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="expenses">
-            Auslagenerstattung
-        </x-home.menu-link>
+        @auth
+            <x-home.menu-link :href="route('expenses')" :icon_url="Vite::asset('resources/images/icons/expense.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="expenses">
+                Auslagenerstattung
+            </x-home.menu-link>
 
-        <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="chat">
-            LfV-Chat
-        </x-home.menu-link>
+            <x-home.menu-link :href="route('chat')" :icon_url="Vite::asset('resources/images/icons/chat.webp')" data-umami-event="home_menu_clicked" data-umami-event-target="chat">
+                LfV-Chat
+            </x-home.menu-link>
+        @endauth
     </div>
 
     @auth

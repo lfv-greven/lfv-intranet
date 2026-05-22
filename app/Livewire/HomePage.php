@@ -11,7 +11,9 @@ class HomePage extends Component
 
     public function mount()
     {
-        $this->event = Event::upcoming()->first();
+        $this->event = auth()->check()
+            ? Event::upcoming()->first()
+            : null;
     }
 
     public function render()

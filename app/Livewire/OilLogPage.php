@@ -23,13 +23,7 @@ class OilLogPage extends Component implements HasActions, HasForms
     use InteractsWithActions;
     use InteractsWithForms;
 
-    public $pilot;
-
-    public $aircraft_id;
-
-    public $oil_level;
-
-    public $oil_refilled;
+    public array $data = [];
 
     #[Locked]
     public ?OilLevelType $oilLevelType = null;
@@ -84,8 +78,9 @@ class OilLogPage extends Component implements HasActions, HasForms
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->statePath('data')
             ->components([
-                Section::make('')
+                Section::make()
                     ->columns(1)
                     ->schema([
 

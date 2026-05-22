@@ -78,7 +78,7 @@ class ExpensesPage extends Component implements HasActions, HasForms
             ->statePath('data')
             ->model(Expense::class)
             ->components([
-                Section::make('')
+                Section::make()
                     ->columns(1)
                     ->schema([
                         TextInput::make('reason')
