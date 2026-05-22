@@ -82,6 +82,9 @@ class LoginPage extends Component implements HasActions, HasForms
 
     public function render()
     {
-        return view('livewire.login-page');
+        return view('livewire.login-page', [
+            'loginMessageTitle' => trim((string) config('services.login_message.title', '')),
+            'loginMessageBody' => trim((string) config('services.login_message.body', '')),
+        ]);
     }
 }

@@ -21,6 +21,11 @@ return [
         'password' => env('VF_PASSWORD'),
     ],
 
+    'login_message' => [
+        'title' => env('LOGIN_MESSAGE_TITLE'),
+        'body' => env('LOGIN_MESSAGE_BODY'),
+    ],
+
     'mattermost' => [
         'url' => env('MATTERMOST_URL'),
         'token' => env('MATTERMOST_TOKEN'),
