@@ -6,6 +6,7 @@ use App\External\Vereinsflieger;
 use App\Models\User;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class VereinsfliegerUserProvider extends EloquentUserProvider
@@ -19,6 +20,12 @@ class VereinsfliegerUserProvider extends EloquentUserProvider
             $credentials['email'],
             $credentials['password'],
         );
+
+        Log::debug('vf login attempt', [
+            'http_status' => $vf->GetHttpStatusCode(),
+            'success' => $loginSuccess,
+            'response' => $vf->GetResponse(),
+        ]);
 
         if (! $loginSuccess) {
             return;
