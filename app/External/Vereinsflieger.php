@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\App;
 
 class Vereinsflieger
 {
-    private $InterfaceUrl = 'https://www.vereinsflieger.de/interface/rest/';
+    private $InterfaceUrl = 'https://vereinsflieger.de/interface/rest/';
 
     // Flightcenter-Kunden müssen hier folgende URL nehmen 'https://www.flightcenterplus.de/interface/rest/'
     // VereinsfliegerRestInterface->SetInterfaceUrl('https://www.flightcenterplus.de/interface/rest/');
