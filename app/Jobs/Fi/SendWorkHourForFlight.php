@@ -54,6 +54,14 @@ class SendWorkHourForFlight implements ShouldQueue
         if (FiSettlementFlight::where('vf_flight_id', $flight->vf_flight_id)
             ->whereNotNull('workhour_sent_at')
             ->exists()) {
+            $flight->forceFill(['excluded_reason' => 'already_sent'])->save();
+
+            Log::info('FI settlement: skip workhour (already sent in another settlement)', [
+                'settlement_id' => $this->settlementId,
+                'flight_id' => $flight->id,
+                'vf_flight_id' => $flight->vf_flight_id,
+            ]);
+
             return;
         }
 

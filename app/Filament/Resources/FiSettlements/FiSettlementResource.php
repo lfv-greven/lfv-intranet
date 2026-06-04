@@ -4,8 +4,11 @@ namespace App\Filament\Resources\FiSettlements;
 
 use App\Enums\FiSettlementStatus;
 use App\Filament\Resources\FiSettlements\Pages\ManageFiSettlements;
+use App\Jobs\Fi\RetryRejectedWorkHours;
 use App\Models\FiSettlement;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -38,6 +41,7 @@ class FiSettlementResource extends Resource
                 'flights as flights_missing_fi_count' => fn (Builder $query) => $query->where('excluded_reason', 'missing_fi_uid'),
                 'flights as flights_invalid_time_count' => fn (Builder $query) => $query->where('excluded_reason', 'invalid_flighttime'),
                 'flights as flights_missing_category_count' => fn (Builder $query) => $query->where('excluded_reason', 'missing_workhour_category'),
+                'retryableRejectedWorkHours as retryable_rejected_work_hours_count',
             ]);
     }
 
@@ -160,6 +164,45 @@ class FiSettlementResource extends Resource
                 TextColumn::make('flights_rejected_count')
                     ->label('VF Fehler')
                     ->alignRight(),
+            ])
+            ->recordActions([
+                Action::make('retry_vf_exports')
+                    ->label('VF-Fehler erneut senden')
+                    ->icon('heroicon-o-arrow-path')
+                    ->iconButton()
+                    ->color('warning')
+                    ->tooltip('VF-Fehler erneut senden')
+                    ->visible(fn (FiSettlement $record): bool => $record->hasRetryableRejectedWorkHours()
+                        && ! in_array($record->status, [
+                            FiSettlementStatus::QUEUED,
+                            FiSettlementStatus::PROCESSING,
+                        ], true))
+                    ->requiresConfirmation()
+                    ->modalHeading('VF-Fehler erneut senden')
+                    ->modalDescription(fn (FiSettlement $record): string => sprintf(
+                        '%d fehlgeschlagene VF-%s werden erneut als Arbeitsstunden gesendet.',
+                        (int) $record->retryable_rejected_work_hours_count,
+                        (int) $record->retryable_rejected_work_hours_count === 1 ? 'Buchung' : 'Buchungen',
+                    ))
+                    ->action(function (FiSettlement $record): void {
+                        if (! $record->queueRejectedWorkHourRetry()) {
+                            Notification::make()
+                                ->title('Retry konnte nicht gestartet werden')
+                                ->body('Es läuft bereits eine Verarbeitung oder es gibt keine retryfähigen VF-Fehler mehr.')
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
+                        RetryRejectedWorkHours::dispatch($record->id);
+
+                        Notification::make()
+                            ->title('Retry gestartet')
+                            ->body('Die fehlgeschlagenen VF-Buchungen werden im Hintergrund erneut gesendet.')
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 

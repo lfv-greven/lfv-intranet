@@ -14,6 +14,12 @@ class ExampleTest extends TestCase
     {
         $response = $this->get('/');
 
+        if (config('auth.login_required')) {
+            $response->assertRedirect(route('login'));
+
+            return;
+        }
+
         $response->assertStatus(200);
     }
 }
