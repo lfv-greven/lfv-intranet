@@ -119,6 +119,7 @@ class SendWorkHourForFlight implements ShouldQueue
             Log::error('FI settlement: VF rejected workhour', [
                 'settlement_id' => $this->settlementId,
                 'flight_id' => $flight->id,
+                'payload' => $payload,
                 'http_status' => $status,
                 'response' => $response,
             ]);
