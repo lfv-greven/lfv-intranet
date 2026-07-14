@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
+use App\Enums\VereinsfliegerPriority;
+use App\Exceptions\VereinsfliegerDeferred;
+use App\Exceptions\VereinsfliegerTransportException;
 use App\Models\GasStation;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Facades\Log;
 
 class VereinsfliegerFuelPrices
 {
-    private const CACHE_KEY_PREFIX = 'vf:articles:';
+    private const CURRENT_CACHE_KEY = 'vf:articles:current';
 
-    private const FAILURE_CACHE_MINUTES = 10;
+    private const LAST_GOOD_CACHE_KEY = 'vf:articles:last-good';
 
     /**
      * @return array<int, array{fuel: string, amount: string, vat_rate: string|null}>
@@ -50,26 +54,32 @@ class VereinsfliegerFuelPrices
      */
     private function getArticlesById(): array
     {
-        $cacheKey = self::CACHE_KEY_PREFIX.now()->toDateString();
-        $cached = cache()->get($cacheKey);
+        $cached = cache()->get(self::CURRENT_CACHE_KEY);
 
         if ($this->isValidCachedArticleMap($cached)) {
             return $cached;
         }
 
         if ($cached !== null) {
-            cache()->forget($cacheKey);
+            cache()->forget(self::CURRENT_CACHE_KEY);
         }
 
-        $articlesById = $this->fetchArticlesById();
+        try {
+            $articlesById = $this->fetchArticlesById();
+        } catch (VereinsfliegerDeferred|VereinsfliegerTransportException $exception) {
+            Log::warning('Vereinsflieger fuel price refresh deferred.', [
+                'message' => $exception->getMessage(),
+            ]);
+
+            return $this->lastGoodArticleMap();
+        }
 
         if ($articlesById === []) {
-            cache()->put($cacheKey, $articlesById, now()->addMinutes(self::FAILURE_CACHE_MINUTES));
-
-            return [];
+            return $this->lastGoodArticleMap();
         }
 
-        cache()->put($cacheKey, $articlesById, now()->endOfDay());
+        cache()->put(self::CURRENT_CACHE_KEY, $articlesById, now()->addMinutes(5));
+        cache()->put(self::LAST_GOOD_CACHE_KEY, $articlesById, now()->addDay());
 
         return $articlesById;
     }
@@ -80,7 +90,7 @@ class VereinsfliegerFuelPrices
     private function fetchArticlesById(): array
     {
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(fn ($vf) => $vf->GetArticles());
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::HIGH, fn ($vf) => $vf->GetArticles());
 
         if (! $success || $status !== 200 || ! is_array($response)) {
             return [];
@@ -102,6 +112,16 @@ class VereinsfliegerFuelPrices
         }
 
         return $articlesById;
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function lastGoodArticleMap(): array
+    {
+        $cached = cache()->get(self::LAST_GOOD_CACHE_KEY);
+
+        return $this->isValidCachedArticleMap($cached) ? $cached : [];
     }
 
     /**

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Enums\VereinsfliegerPriority;
+use App\Jobs\Concerns\UsesVereinsfliegerLowPriorityQueue;
 use App\Models\Expense;
 use App\Services\VereinsfliegerUsers;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -11,13 +13,14 @@ use Illuminate\Foundation\Queue\Queueable;
 class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
+    use UsesVereinsfliegerLowPriorityQueue;
 
     /**
      * Create a new job instance.
      */
     public function __construct(public Expense $expense)
     {
-        //
+        $this->configureVereinsfliegerLowPriorityQueue();
     }
 
     /**
@@ -26,7 +29,10 @@ class EnrichExpenseWithIban implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         // Find respective member
-        $bankData = app(VereinsfliegerUsers::class)->findBankDataByMemberId($this->expense->user->memberid);
+        $bankData = app(VereinsfliegerUsers::class)->findBankDataByMemberId(
+            $this->expense->user->memberid,
+            VereinsfliegerPriority::LOW,
+        );
 
         if (! $bankData) {
             return;

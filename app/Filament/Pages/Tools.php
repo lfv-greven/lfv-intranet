@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\VereinsfliegerPriority;
 use App\External\Mattermost;
 use App\Services\VereinsfliegerUsers;
 use Filament\Actions\Action;
@@ -58,7 +59,7 @@ class Tools extends Page
             ->requiresConfirmation()
             ->action(function (array $data): void {
                 $memberId = (int) ($data['vf_member_id'] ?? 0);
-                $vfUser = app(VereinsfliegerUsers::class)->findByMemberId($memberId);
+                $vfUser = app(VereinsfliegerUsers::class)->findByMemberId($memberId, VereinsfliegerPriority::HIGH);
                 $email = trim((string) data_get($vfUser, 'email', ''));
 
                 if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -99,7 +100,7 @@ class Tools extends Page
             return [];
         }
 
-        return collect(app(VereinsfliegerUsers::class)->all())
+        return collect(app(VereinsfliegerUsers::class)->all(VereinsfliegerPriority::HIGH))
             ->filter(function (array $user) use ($needle): bool {
                 $haystack = collect([
                     data_get($user, 'memberid'),
@@ -139,7 +140,7 @@ class Tools extends Page
             return null;
         }
 
-        $user = app(VereinsfliegerUsers::class)->findByMemberId($memberId);
+        $user = app(VereinsfliegerUsers::class)->findByMemberId($memberId, VereinsfliegerPriority::HIGH);
 
         return $user ? $this->formatVfMemberLabel($user) : null;
     }

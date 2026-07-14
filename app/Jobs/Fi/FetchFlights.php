@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Fi;
 
+use App\Enums\VereinsfliegerPriority;
+use App\Jobs\Concerns\UsesVereinsfliegerLowPriorityQueue;
 use App\Jobs\Fi\Concerns\HandlesFiSettlementFailure;
 use App\Models\FiSettlement;
 use App\Models\FiSettlementFlight;
@@ -15,11 +17,15 @@ class FetchFlights implements ShouldQueue
 {
     use HandlesFiSettlementFailure;
     use Queueable;
+    use UsesVereinsfliegerLowPriorityQueue;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(public string $settlementId) {}
+    public function __construct(public string $settlementId)
+    {
+        $this->configureVereinsfliegerLowPriorityQueue();
+    }
 
     /**
      * Execute the job.
@@ -37,7 +43,7 @@ class FetchFlights implements ShouldQueue
         ]);
 
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($settlement) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) use ($settlement) {
             return $vf->GetFlights_Daterange(
                 $settlement->period_from->format('Y-m-d'),
                 $settlement->period_to->format('Y-m-d'),
@@ -50,6 +56,8 @@ class FetchFlights implements ShouldQueue
                 'http_status' => $status,
                 'response' => $response,
             ]);
+
+            throw new \RuntimeException('Vereinsflieger flights request failed (HTTP '.$status.').');
         }
         $flights = $this->filterFlights(is_array($response) ? $response : [], $settings['ftid_filter']);
 

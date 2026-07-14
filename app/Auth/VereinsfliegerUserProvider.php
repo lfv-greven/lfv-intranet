@@ -2,8 +2,8 @@
 
 namespace App\Auth;
 
-use App\External\Vereinsflieger;
 use App\Models\User;
+use App\Services\VereinsfliegerClient;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
@@ -13,38 +13,29 @@ class VereinsfliegerUserProvider extends EloquentUserProvider
 {
     public function retrieveByCredentials(array $credentials)
     {
-        $vf = app()->make(Vereinsflieger::class);
-
-        // Try to login in vf API
-        $loginSuccess = $vf->SignIn(
+        $login = app(VereinsfliegerClient::class)->loginMember(
             $credentials['email'],
             $credentials['password'],
         );
 
         Log::debug('vf login attempt', [
-            'http_status' => $vf->GetHttpStatusCode(),
-            'success' => $loginSuccess,
-            'response' => $vf->GetResponse(),
+            'success' => $login !== null,
         ]);
 
-        if (! $loginSuccess) {
+        if ($login === null) {
             return;
         }
 
-        // Login was successful, sync user data locally
-        $user = $vf->GetUser();
-
-        return static::transformVfUser($user, $vf->GetAccessToken(), $credentials['password']);
+        return static::transformVfUser($login, $credentials['password']);
     }
 
-    public static function transformVfUser(array $vfUser, ?string $accessToken = null, $password = null): User
+    public static function transformVfUser(array $vfUser, ?string $password = null): User
     {
         $user = User::updateOrCreate(
             ['id' => $vfUser['uid']],
             [
                 ...Arr::only($vfUser, ['firstname', 'lastname', 'memberid', 'status', 'roles', 'email']),
                 'password' => $password ?? Str::random(),
-                'vf_accesstoken' => $accessToken,
                 'email_verified_at' => now(),
             ],
         );
