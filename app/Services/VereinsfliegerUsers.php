@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Enums\VereinsfliegerPriority;
+
 class VereinsfliegerUsers
 {
     private const CACHE_KEY = 'vf:users';
 
-    public function all(): array
+    public function all(VereinsfliegerPriority $priority): array
     {
         $cached = cache()->get(self::CACHE_KEY);
 
@@ -18,7 +20,7 @@ class VereinsfliegerUsers
             cache()->forget(self::CACHE_KEY);
         }
 
-        $users = $this->fetchUsers();
+        $users = $this->fetchUsers($priority);
 
         if ($users !== []) {
             cache()->put(self::CACHE_KEY, $users, now()->endOfDay());
@@ -27,13 +29,13 @@ class VereinsfliegerUsers
         return $users;
     }
 
-    public function findByMemberId(?int $memberId): ?array
+    public function findByMemberId(?int $memberId, VereinsfliegerPriority $priority): ?array
     {
         if (! $memberId) {
             return null;
         }
 
-        foreach ($this->all() as $user) {
+        foreach ($this->all($priority) as $user) {
             if ((int) data_get($user, 'memberid') === $memberId) {
                 return $user;
             }
@@ -42,18 +44,18 @@ class VereinsfliegerUsers
         return null;
     }
 
-    public function findBankDataByMemberId(?int $memberId): ?array
+    public function findBankDataByMemberId(?int $memberId, VereinsfliegerPriority $priority): ?array
     {
-        return $this->extractBankData($this->findByMemberId($memberId));
+        return $this->extractBankData($this->findByMemberId($memberId, $priority));
     }
 
-    public function findByUserId(?int $userId): ?array
+    public function findByUserId(?int $userId, VereinsfliegerPriority $priority): ?array
     {
         if (! $userId) {
             return null;
         }
 
-        foreach ($this->all() as $user) {
+        foreach ($this->all($priority) as $user) {
             if ((int) data_get($user, 'uid') === $userId) {
                 return $user;
             }
@@ -62,15 +64,15 @@ class VereinsfliegerUsers
         return null;
     }
 
-    public function findBankDataByUserId(?int $userId): ?array
+    public function findBankDataByUserId(?int $userId, VereinsfliegerPriority $priority): ?array
     {
-        return $this->extractBankData($this->findByUserId($userId));
+        return $this->extractBankData($this->findByUserId($userId, $priority));
     }
 
-    private function fetchUsers(): array
+    private function fetchUsers(VereinsfliegerPriority $priority): array
     {
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) {
+        [$success, $status, $response] = $client->callWithRetry($priority, function ($vf) {
             return $vf->GetUsers();
         });
 

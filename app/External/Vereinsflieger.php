@@ -2,7 +2,10 @@
 
 namespace App\External;
 
-use Illuminate\Support\Facades\App;
+use App\Enums\VereinsfliegerPriority;
+use App\Exceptions\VereinsfliegerDeferred;
+use App\Exceptions\VereinsfliegerTransportException;
+use App\Services\VereinsfliegerRequestGate;
 
 class Vereinsflieger
 {
@@ -10,14 +13,19 @@ class Vereinsflieger
 
     // Flightcenter-Kunden müssen hier folgende URL nehmen 'https://www.flightcenterplus.de/interface/rest/'
     // VereinsfliegerRestInterface->SetInterfaceUrl('https://www.flightcenterplus.de/interface/rest/');
-    private $AccessToken;
+    private ?string $AccessToken;
 
     private $HttpStatusCode = 0;
 
     private $aResponse = [];
 
-    public function __construct(?string $accessToken = null)
-    {
+    private array $ResponseHeaders = [];
+
+    public function __construct(
+        private readonly VereinsfliegerRequestGate $requestGate,
+        private readonly VereinsfliegerPriority $priority,
+        ?string $accessToken = null,
+    ) {
         $this->AccessToken = $accessToken;
     }
 
@@ -558,13 +566,38 @@ class Vereinsflieger
         return $this->aResponse;
     }
 
+    public function GetRetryAfter(): ?int
+    {
+        $retryAfter = $this->ResponseHeaders['retry-after'][0] ?? null;
+
+        if (! is_string($retryAfter) || $retryAfter === '') {
+            return null;
+        }
+
+        if (ctype_digit($retryAfter)) {
+            return max(1, (int) $retryAfter);
+        }
+
+        $timestamp = strtotime($retryAfter);
+
+        return $timestamp === false ? null : max(1, $timestamp - time());
+    }
+
     // =============================================================================================
     // SendRequest
     // =============================================================================================
     private function SendRequest($Method, $Resource, $Data)
     {
+        $this->ResponseHeaders = [];
+        $this->requestGate->admit($this->priority, $this->isUnauthenticated($Resource));
+
         $InterfaceUrl = $this->InterfaceUrl.$Resource;
         $CurlHandle = curl_init();
+
+        if ($CurlHandle === false) {
+            throw new VereinsfliegerTransportException($Resource, 'Unable to initialize cURL.');
+        }
+
         curl_setopt($CurlHandle, CURLOPT_URL, $InterfaceUrl);
         switch ($Method) {
             case 'GET':
@@ -590,14 +623,41 @@ class Vereinsflieger
                 break;
         }
         curl_setopt($CurlHandle, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($CurlHandle, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($CurlHandle, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($CurlHandle, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($CurlHandle, CURLOPT_CONNECTTIMEOUT, (int) config('services.vereinsflieger.http.connect_timeout_seconds', 5));
+        curl_setopt($CurlHandle, CURLOPT_TIMEOUT, (int) config('services.vereinsflieger.http.timeout_seconds', 20));
+        curl_setopt($CurlHandle, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($CurlHandle, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($CurlHandle, CURLOPT_HEADERFUNCTION, function ($handle, string $header): int {
+            $length = strlen($header);
+            $parts = explode(':', $header, 2);
+
+            if (count($parts) === 2) {
+                $name = strtolower(trim($parts[0]));
+                $value = trim($parts[1]);
+
+                if ($name !== '') {
+                    $this->ResponseHeaders[$name][] = $value;
+                }
+            }
+
+            return $length;
+        });
         $Html = curl_exec($CurlHandle);
 
         $this->HttpStatusCode = curl_getinfo($CurlHandle, CURLINFO_HTTP_CODE);
-        if ($this->HttpStatusCode == 401) {
-            // Token expired, force recreate and relogin
-            App::forgetInstance('vfadmin');
+        if ($Html === false) {
+            $error = curl_error($CurlHandle);
+            curl_close($CurlHandle);
+
+            throw new VereinsfliegerTransportException($Resource, $error === '' ? 'Unknown cURL error.' : $error);
+        }
+
+        if ($this->HttpStatusCode === 429) {
+            $retryAfter = $this->requestGate->cooldown($this->GetRetryAfter());
+            curl_close($CurlHandle);
+
+            throw new VereinsfliegerDeferred($retryAfter, 'upstream_429');
         }
 
         $ContentType = curl_getinfo($CurlHandle, CURLINFO_CONTENT_TYPE);
@@ -615,6 +675,12 @@ class Vereinsflieger
         }
 
         return true;
+    }
+
+    private function isUnauthenticated(string $resource): bool
+    {
+        return $this->AccessToken === null
+            || in_array($resource, ['auth/accesstoken', 'auth/signin'], true);
     }
 
     // =============================================================================================

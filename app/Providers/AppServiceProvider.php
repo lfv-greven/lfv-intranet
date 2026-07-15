@@ -4,12 +4,14 @@ namespace App\Providers;
 
 use App\Auth\VereinsfliegerUserProvider;
 use App\External\Gotenberg;
-use App\External\Vereinsflieger;
 use App\Models\User;
+use App\Services\VereinsfliegerClient;
+use App\Services\VereinsfliegerRequestGate;
 use Carbon\Carbon;
 use Filament\Support\Facades\FilamentColor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
@@ -27,8 +29,18 @@ class AppServiceProvider extends ServiceProvider
             config('services.gotenberg.password'),
         ));
 
-        $this->app->singleton(Vereinsflieger::class, fn () => new Vereinsflieger);
+        $this->app->singleton(VereinsfliegerRequestGate::class, function () {
+            return new VereinsfliegerRequestGate(
+                Cache::store(config('services.vereinsflieger.rate_limit.cache_store')),
+            );
+        });
 
+        $this->app->singleton(VereinsfliegerClient::class, function ($app) {
+            return new VereinsfliegerClient(
+                $app->make(VereinsfliegerRequestGate::class),
+                Cache::store(config('services.vereinsflieger.rate_limit.cache_store')),
+            );
+        });
     }
 
     /**

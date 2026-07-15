@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Auth\VereinsfliegerUserProvider;
-use App\External\Vereinsflieger;
+use App\Exceptions\VereinsfliegerDeferred;
+use App\Exceptions\VereinsfliegerTransportException;
+use App\Services\VereinsfliegerClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
@@ -12,13 +14,20 @@ class AuthController extends Controller
 {
     public function vfIframe(Request $request)
     {
-        if (! $request->has('accesstoken')) {
+        $token = $request->input('accesstoken');
+
+        if (! is_string($token) || blank($token)) {
             abort(400, 'Missing access token');
         }
 
-        $token = $request->get('accesstoken');
-        $vf = app()->make(Vereinsflieger::class);
-        $vfUser = $vf->IframeLogin($token);
+        try {
+            $vfUser = app(VereinsfliegerClient::class)->loginIframe($token);
+        } catch (VereinsfliegerDeferred|VereinsfliegerTransportException) {
+            return response()->view('auth.vf-iframe', [
+                'loginUrl' => null,
+                'errorMessage' => 'Die Anmeldung ist vorübergehend nicht verfügbar. Bitte versuche es in wenigen Minuten erneut.',
+            ], 503);
+        }
 
         $loginUrl = url('/');
         if ($vfUser) {

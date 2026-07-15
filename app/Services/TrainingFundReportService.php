@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\TrainingFundReportStatus;
+use App\Enums\VereinsfliegerPriority;
+use App\Exceptions\VereinsfliegerDeferred;
 use App\Models\TrainingFundReport;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
@@ -110,6 +112,15 @@ class TrainingFundReportService
                     'start_pauschale_unknown' => $startPauschaleUnknown,
                 ],
             ])->save();
+        } catch (VereinsfliegerDeferred $e) {
+            $report->fill([
+                'status' => TrainingFundReportStatus::QUEUED,
+                'started_at' => null,
+                'completed_at' => null,
+                'error_message' => null,
+            ])->save();
+
+            throw $e;
         } catch (\Throwable $e) {
             $report->fill([
                 'status' => TrainingFundReportStatus::FAILED,
@@ -159,7 +170,7 @@ class TrainingFundReportService
     private function fetchFlights(Carbon $from, Carbon $to): array
     {
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($from, $to) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) use ($from, $to) {
             return $vf->GetFlights_Daterange(
                 $from->format('Y-m-d'),
                 $to->format('Y-m-d'),
@@ -231,7 +242,7 @@ class TrainingFundReportService
     private function fetchAccountTransactions(Carbon $from, Carbon $to): array
     {
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($from, $to) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) use ($from, $to) {
             return $vf->GetAccountTransactions_daterange(
                 $from->format('Y-m-d'),
                 $to->format('Y-m-d'),

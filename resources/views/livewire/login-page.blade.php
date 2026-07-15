@@ -48,10 +48,14 @@
                 x-data
                 x-on:focusin.once="window.trackUmamiEvent('login_start')"
             >
-                @if($error)
+                @if($errorType !== null)
                     <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                         <strong>Fehler:</strong>
-                        Die Anmeldung konnte nicht durchgeführt werden. Prüfe deine Zugangsdaten.
+                        @if($errorType === 'credentials')
+                            Die Anmeldung konnte nicht durchgeführt werden. Prüfe deine Zugangsdaten.
+                        @else
+                            Die Anmeldung ist vorübergehend nicht verfügbar. Bitte versuche es in wenigen Minuten erneut.
+                        @endif
                     </div>
                 @endif
 

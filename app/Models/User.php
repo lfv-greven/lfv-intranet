@@ -27,7 +27,6 @@ class User extends Authenticatable implements FilamentUser
         'lastname',
         'email',
         'password',
-        'vf_accesstoken',
         'memberid',
         'status',
         'roles',
@@ -53,7 +52,6 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'vf_accesstoken' => 'encrypted',
             'roles' => 'collection',
             'department_joined_at' => 'datetime',
         ];

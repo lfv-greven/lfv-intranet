@@ -50,7 +50,7 @@ class BuildFiSettlement implements ShouldBeUnique, ShouldQueue
         Bus::chain([
             new FetchFlights($this->settlement->id),
             new DispatchWorkHoursBatch($this->settlement->id),
-        ])->dispatch();
+        ])->onQueue('vereinsflieger-low')->dispatch();
     }
 
     public function uniqueId()

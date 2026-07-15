@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\TrainingFund;
 
+use App\Jobs\TrainingFund\CalculateTrainingFundReport;
 use App\Services\TrainingFundReportService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -19,11 +20,12 @@ class CalculateTrainingFundReports extends Command
 
         $month = $this->parseMonth($monthInput);
 
-        $this->info('Calculating training fund report for '.$month->format('Y-m').'...');
+        $this->info('Queueing training fund report for '.$month->format('Y-m').'...');
 
-        $service->calculateForMonth($month, $overwrite);
+        $report = $service->queueForMonth($month, $overwrite);
+        CalculateTrainingFundReport::dispatch($report->month->toDateString(), $overwrite);
 
-        $this->info('Done.');
+        $this->info('Queued.');
 
         return self::SUCCESS;
     }

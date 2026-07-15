@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Mattermost;
 
+use App\Enums\VereinsfliegerPriority;
 use App\Jobs\Mattermost\CreateUser;
 use App\Jobs\Mattermost\DeactivateUser;
 use App\Jobs\Mattermost\UpdateUser;
@@ -21,7 +22,7 @@ class SyncVereinsfliegerUsers extends Command
     public function handle(MattermostClient $mattermost, VereinsfliegerUsers $vfUsers): int
     {
         $allowedStatuses = config('mattermost_sync.allowed_statuses', []);
-        $vfList = $this->filterVfUsers($vfUsers->all(), $allowedStatuses);
+        $vfList = $this->filterVfUsers($vfUsers->all(VereinsfliegerPriority::LOW), $allowedStatuses);
 
         if ($vfList === []) {
             $this->warn('Keine Vereinsflieger Nutzer gefunden.');

@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Vf;
 
+use App\Jobs\Concerns\UsesVereinsfliegerLowPriorityQueue;
 use App\Models\Refueling;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,11 +11,15 @@ use Illuminate\Foundation\Queue\Queueable;
 class SendRefueling implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
+    use UsesVereinsfliegerLowPriorityQueue;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(public Refueling $refueling) {}
+    public function __construct(public Refueling $refueling)
+    {
+        $this->configureVereinsfliegerLowPriorityQueue();
+    }
 
     /**
      * Execute the job.

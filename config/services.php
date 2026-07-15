@@ -19,6 +19,24 @@ return [
         'cid' => env('VF_CID'),
         'username' => env('VF_USERNAME'),
         'password' => env('VF_PASSWORD'),
+        'token_ttl_seconds' => (int) env('VF_TOKEN_TTL_SECONDS', 3600),
+        'http' => [
+            'connect_timeout_seconds' => (int) env('VF_CONNECT_TIMEOUT_SECONDS', 5),
+            'timeout_seconds' => (int) env('VF_TIMEOUT_SECONDS', 20),
+        ],
+        'rate_limit' => [
+            'cache_store' => env('VF_CACHE_STORE', env('CACHE_STORE', 'database')),
+            'namespace' => env('VF_RATE_LIMIT_NAMESPACE', 'vereinsflieger'),
+            'unauthenticated_interval_ms' => 3750,
+            'authenticated_interval_ms' => 1250,
+            'low_authenticated_interval_ms' => 2000,
+            'high_max_wait_ms' => 4000,
+            'low_max_wait_ms' => 4000,
+            'login_failure_limit' => 8,
+            'login_failure_window_seconds' => 180,
+            'lock_seconds' => (int) env('VF_LOCK_SECONDS', 90),
+            'cooldown_seconds' => 180,
+        ],
     ],
 
     'login_message' => [

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Vf;
 
-use App\External\Vereinsflieger;
+use App\Enums\VereinsfliegerPriority;
 use App\Models\MotortimeReminder;
 use App\Services\VereinsfliegerClient;
 use App\Services\VereinsfliegerUsers;
@@ -35,20 +35,22 @@ class CheckMotortimes extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(VereinsfliegerClient $client): int
     {
-        /**
-         * @var Vereinsflieger
-         */
-        $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) {
             return $vf->GetFlights_Daterange(
                 now()->subMonth()->format('Y-m-d'),
                 now()->format('Y-m-d'),
             );
         });
 
-        $allFlights = is_array($response) ? $response : [];
+        if (! $success || ! is_array($response)) {
+            $this->error('Vereinsflieger-Flugdaten konnten nicht geladen werden (HTTP '.$status.').');
+
+            return self::FAILURE;
+        }
+
+        $allFlights = $response;
 
         $allowedCallsigns = [
             'D-EDDG',
@@ -74,6 +76,8 @@ class CheckMotortimes extends Command
 
             $this->newLine();
         }
+
+        return self::SUCCESS;
     }
 
     private function checkTimes(Collection $flights)
@@ -261,7 +265,7 @@ TEXT, function (Message $mail) use ($mails, $flightId) {
 
     private function getMailForUserId(int $userId): ?string
     {
-        $user = app(VereinsfliegerUsers::class)->findByUserId($userId);
+        $user = app(VereinsfliegerUsers::class)->findByUserId($userId, VereinsfliegerPriority::LOW);
         $email = data_get($user, 'email');
 
         if (! is_string($email)) {

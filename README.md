@@ -33,7 +33,15 @@ pnpm dev
 ## Important Environment Variables
 
 - `VF_USERNAME`, `VF_PASSWORD`, `VF_APPKEY`, `VF_CID`: Vereinsflieger credentials
+- `VF_CACHE_STORE`, `VF_RATE_LIMIT_NAMESPACE`: shared cache store and namespace for the Vereinsflieger request gate
+- `VF_TOKEN_TTL_SECONDS`, `VF_CONNECT_TIMEOUT_SECONDS`, `VF_TIMEOUT_SECONDS`, `VF_LOCK_SECONDS`: cached service-token lifetime, HTTP timeouts, and shared-lock lifetime
 - `FI_WORKHOURS_CATEGORY_ID`: workhours category id used for FI workflows (default: `8471`)
+
+## Vereinsflieger Integration
+
+All Vereinsflieger access goes through `App\Services\VereinsfliegerClient`. The client uses a shared cache lock to pace requests below the upstream limits, caches the service token, and stops login attempts before the upstream failed-login lock can be reached.
+
+For installations served from multiple domains or application instances, every instance must use the same `VF_CACHE_STORE`, cache prefix, `VF_RATE_LIMIT_NAMESPACE`, and `APP_KEY`. The cache store must support atomic locks; Laravel's database cache store is sufficient when all instances use the same database. The low-priority queue worker in `docker/supervisor/queue.conf` must be deployed alongside the default queue worker.
 
 ## Development
 
@@ -62,7 +70,7 @@ pnpm dev
 - `login_start`
 - `login_attempt`
 - `login_success`
-- `login_error` (`error_type`: `validation`, `credentials`)
+- `login_error` (`error_type`: `validation`, `credentials`, `rate_limited`, `service_unavailable`)
 - `refueling_start`
 - `refueling_gas_station_selected`
 - `refueling_aircraft_selected`
@@ -112,7 +120,7 @@ pnpm dev
 ## Notes
 
 - Do not commit secrets.
-- Access to Vereinsflieger should go through `App\Services\VereinsfliegerClient` to keep login and retry behavior consistent.
+- Use `VereinsfliegerPriority::HIGH` for interactive, real-time calls such as login and fuel prices. Use `VereinsfliegerPriority::LOW` for exports, FI settlement, and scheduled synchronization.
 
 ## Contributing
 

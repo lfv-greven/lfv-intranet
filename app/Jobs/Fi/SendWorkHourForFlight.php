@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Fi;
 
+use App\Enums\VereinsfliegerPriority;
+use App\Jobs\Concerns\UsesVereinsfliegerLowPriorityQueue;
 use App\Jobs\Fi\Concerns\HandlesFiSettlementFailure;
 use App\Models\FiSettlementFlight;
 use App\Services\VereinsfliegerClient;
@@ -16,11 +18,15 @@ class SendWorkHourForFlight implements ShouldQueue
     use Batchable;
     use HandlesFiSettlementFailure;
     use Queueable;
+    use UsesVereinsfliegerLowPriorityQueue;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(public string $settlementId, public string $flightId) {}
+    public function __construct(public string $settlementId, public string $flightId)
+    {
+        $this->configureVereinsfliegerLowPriorityQueue();
+    }
 
     /**
      * Execute the job.
@@ -110,7 +116,7 @@ class SendWorkHourForFlight implements ShouldQueue
         $payload['comment'] = $this->comment($flight);
 
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($payload) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) use ($payload) {
             return $vf->InsertWorkHours($payload);
         });
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\Uppercase;
 use App\Enums\RefuelingType;
+use App\Enums\VereinsfliegerPriority;
 use App\Services\VereinsfliegerClient;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -126,7 +127,7 @@ class Refueling extends Model
         }
 
         $client = app(VereinsfliegerClient::class);
-        [$success, $status, $response] = $client->callWithRetry(function ($vf) use ($comment) {
+        [$success, $status, $response] = $client->callWithRetry(VereinsfliegerPriority::LOW, function ($vf) use ($comment) {
             return $vf->InsertSale([
                 'bookingdate' => $this->date->format('Y-m-d'),
                 'articleid' => $this->gasStation->vf_articleid,
