@@ -13,7 +13,7 @@ It covers recurring club processes such as refueling, oil logging, expense submi
 
 ## Tech Stack
 
-- Laravel 12
+- Laravel 13
 - Livewire 4
 - Filament 5
 - Tailwind CSS 4
@@ -23,11 +23,11 @@ It covers recurring club processes such as refueling, oil logging, expense submi
 
 ```bash
 composer install
-pnpm install
+npm ci
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
-pnpm dev
+npm run dev
 ```
 
 ## Important Environment Variables
@@ -46,10 +46,10 @@ For installations served from multiple domains or application instances, every i
 ## Development
 
 - Start the backend: `php artisan serve`
-- Start the frontend: `pnpm dev`
+- Start the frontend: `npm run dev`
 - Run tests: `php artisan test`
 - Run code style fixes: `./vendor/bin/pint`
-- Build production assets: `pnpm build`
+- Build production assets: `npm run build`
 
 ## Umami Event Tracking
 
