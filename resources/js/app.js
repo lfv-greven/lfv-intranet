@@ -1,7 +1,5 @@
 import "./bootstrap";
 
-import.meta.glob(["../images/**"]);
-
 const umamiPendingEvents = [];
 
 const sanitizeUmamiData = (data = {}) => {

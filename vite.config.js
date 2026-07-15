@@ -12,6 +12,7 @@ export default defineConfig({
                 "resources/css/pdf/department-descriptions.css",
                 "resources/js/app.js",
             ],
+            assets: ["resources/images/**"],
             refresh: true,
         }),
         tailwindcss(),
