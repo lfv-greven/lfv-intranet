@@ -61,6 +61,7 @@ class CheckMotortimes extends Command
             'D-ESEG',
             'D-MLFV',
             'D-MHLA',
+            'D-MHLF',
         ];
         $flights = collect(array_filter($allFlights, fn ($row) => is_array($row)))
             ->filter(fn ($row) => isset($row['motorstart'], $row['motorend']))
